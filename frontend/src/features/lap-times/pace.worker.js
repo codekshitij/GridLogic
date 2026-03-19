@@ -16,7 +16,7 @@ self.onmessage = (e) => {
       if (!driverLaps) return;
 
       driverLaps.forEach((lap) => {
-        if (typeof lap?.t !== 'number') return;
+        if (typeof lap?.t !== "number") return;
         if (!fastest || lap.t < fastest.Time) {
           fastest = {
             Driver: code,

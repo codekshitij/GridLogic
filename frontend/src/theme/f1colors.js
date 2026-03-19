@@ -14,20 +14,31 @@ export const teamColors = {
 
 // Mapping drivers to their respective teams for color lookup
 const driverToTeam = {
-  VER: 'RBR', HAD: 'RBR',
-  NOR: 'MCL', PIA: 'MCL',
-  HAM: 'FER', LEC: 'FER',
-  RUS: 'MER', ANT: 'MER',
-  SAI: 'WIL', ALB: 'WIL',
-  ALO: 'AST', STR: 'AST',
-  GAS: 'ALP', COL: 'ALP',
-  OCO: 'HAA', BEA: 'HAA',
-  LAW: 'RAB', LIN: 'RAB',
+  VER: "RBR",
+  HAD: "RBR",
+  NOR: "MCL",
+  PIA: "MCL",
+  HAM: "FER",
+  LEC: "FER",
+  RUS: "MER",
+  ANT: "MER",
+  SAI: "WIL",
+  ALB: "WIL",
+  ALO: "AST",
+  STR: "AST",
+  GAS: "ALP",
+  COL: "ALP",
+  OCO: "HAA",
+  BEA: "HAA",
+  LAW: "RAB",
+  LIN: "RAB",
   // Add 2024 drivers if testing old data
-  PER: 'RBR', TSU: 'RAB', RIC: 'RAB', 
+  PER: "RBR",
+  TSU: "RAB",
+  RIC: "RAB",
 };
 
 export const getDriverColor = (driverCode) => {
   const teamCode = driverToTeam[driverCode?.toUpperCase()];
-  return teamColors[teamCode] || '#FFFFFF'; // Default to white if not found
+  return teamColors[teamCode] || "#FFFFFF"; // Default to white if not found
 };

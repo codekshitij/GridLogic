@@ -35,3 +35,15 @@ export const useDriverTelemetry = (year, gp, selectedDrivers) => {
     enabled: !!year && !!gp && driversArray.length > 0,
   });
 };
+
+export const useRaceAnalytics = (year, gp) => {
+  return useQuery({
+    queryKey: ["raceAnalytics", year, gp],
+    queryFn: async () => {
+      const { data } = await axios.get(`${BASE_URL}/${year}/${gp}/analytics`);
+      return data;
+    },
+    staleTime: Infinity,
+    enabled: !!year && !!gp,
+  });
+};
