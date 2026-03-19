@@ -69,6 +69,13 @@ def get_driver_telemetry(year: int, gp: str, drivers: str = Query(...)):
     data = processor.get_selective_telemetry(year, gp, driver_list)
     return {"pace_evolution": data}
 
+@app.get("/races/{year}/{gp}/analytics")
+def get_race_analytics(year: int, gp: str):
+    try:
+        return processor.get_race_analytics(year, gp)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to compute analytics: {str(e)}")
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)

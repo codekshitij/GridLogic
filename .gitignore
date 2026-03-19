@@ -20,6 +20,7 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+bun-debug.log*
 lerna-debug.log*
 
 # Environment files
@@ -61,3 +62,9 @@ htmlcov/
 
 # Build caches
 .cache/
+
+# Local notebooks / scratch files
+fastf1.ipynb
+
+# Unused local asset
+frontend/src/assets/hero.png
