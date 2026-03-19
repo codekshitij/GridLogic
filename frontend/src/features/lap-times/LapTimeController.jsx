@@ -8,6 +8,7 @@ const LapTimeController = ({
   gp,
   selectedDrivers,
   onSelectionChange,
+  visibleSections,
 }) => {
   const meta = useRaceMeta(year, gp);
   const analytics = useRaceAnalytics(year, gp);
@@ -43,6 +44,7 @@ const LapTimeController = ({
           analytics={analytics.data}
           selectedDrivers={selectedDrivers}
           allDrivers={allDrivers}
+          visibleSections={visibleSections}
         />
       ) : (
         <div style={styles.emptyState}>NO ANALYTICS DATA AVAILABLE</div>

@@ -46,8 +46,25 @@ const sorters = {
   overtakes_estimate: (a, b) => b.overtakes_estimate - a.overtakes_estimate,
 };
 
-const RaceAnalyticsDashboard = ({ analytics, selectedDrivers, allDrivers }) => {
+const ALL_SECTIONS = [
+  "lap-times",
+  "gaps",
+  "strategy",
+  "pit-fuel",
+  "comparisons",
+  "weather",
+  "race-control",
+  "setup",
+];
+
+const RaceAnalyticsDashboard = ({
+  analytics,
+  selectedDrivers,
+  allDrivers,
+  visibleSections = ALL_SECTIONS,
+}) => {
   const [sortBy, setSortBy] = useState("avg_lap_s");
+  const visible = useMemo(() => new Set(visibleSections), [visibleSections]);
 
   const fallbackDrivers = useMemo(
     () => allDrivers?.slice(0, 2).map((d) => d.code) || [],
@@ -120,7 +137,8 @@ const RaceAnalyticsDashboard = ({ analytics, selectedDrivers, allDrivers }) => {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-      <section style={sectionStyle}>
+      {visible.has("lap-times") && (
+        <section style={sectionStyle}>
         <div
           style={{
             display: "grid",
@@ -212,9 +230,11 @@ const RaceAnalyticsDashboard = ({ analytics, selectedDrivers, allDrivers }) => {
             </div>
           </div>
         </div>
-      </section>
+        </section>
+      )}
 
-      <section style={sectionStyle}>
+      {visible.has("gaps") && (
+        <section style={sectionStyle}>
         <div style={tinyLabel}>Gaps And Intervals</div>
         <div style={{ height: 260, marginTop: "0.5rem" }}>
           <ResponsiveContainer width="100%" height="100%">
@@ -236,9 +256,11 @@ const RaceAnalyticsDashboard = ({ analytics, selectedDrivers, allDrivers }) => {
             </LineChart>
           </ResponsiveContainer>
         </div>
-      </section>
+        </section>
+      )}
 
-      <section style={sectionStyle}>
+      {visible.has("strategy") && (
+        <section style={sectionStyle}>
         <div
           style={{
             display: "grid",
@@ -314,9 +336,11 @@ const RaceAnalyticsDashboard = ({ analytics, selectedDrivers, allDrivers }) => {
             </tbody>
           </table>
         </div>
-      </section>
+        </section>
+      )}
 
-      <section style={sectionStyle}>
+      {visible.has("pit-fuel") && (
+        <section style={sectionStyle}>
         <div
           style={{
             display: "grid",
@@ -421,9 +445,11 @@ const RaceAnalyticsDashboard = ({ analytics, selectedDrivers, allDrivers }) => {
             ))}
           </div>
         </div>
-      </section>
+        </section>
+      )}
 
-      <section style={sectionStyle}>
+      {visible.has("comparisons") && (
+        <section style={sectionStyle}>
         <div
           style={{
             display: "flex",
@@ -509,9 +535,11 @@ const RaceAnalyticsDashboard = ({ analytics, selectedDrivers, allDrivers }) => {
             ))}
           </div>
         </div>
-      </section>
+        </section>
+      )}
 
-      <section style={sectionStyle}>
+      {visible.has("weather") && (
+        <section style={sectionStyle}>
         <div
           style={{
             display: "grid",
@@ -597,9 +625,11 @@ const RaceAnalyticsDashboard = ({ analytics, selectedDrivers, allDrivers }) => {
             </div>
           </div>
         </div>
-      </section>
+        </section>
+      )}
 
-      <section style={sectionStyle}>
+      {(visible.has("race-control") || visible.has("setup")) && (
+        <section style={sectionStyle}>
         <div
           style={{
             display: "grid",
@@ -607,60 +637,73 @@ const RaceAnalyticsDashboard = ({ analytics, selectedDrivers, allDrivers }) => {
             gap: "1rem",
           }}
         >
-          <div>
-            <div style={tinyLabel}>Race Replay And Visualization</div>
-            <div
-              style={{
-                fontSize: "0.8rem",
-                color: "#aaa",
-                marginTop: "0.45rem",
-              }}
-            >
-              Interactive map/video sync: unavailable in current public timing
-              feed. Timeline still highlights major race-control events.
+          {visible.has("race-control") ? (
+            <div>
+              <div style={tinyLabel}>Race Replay And Visualization</div>
+              <div
+                style={{
+                  fontSize: "0.8rem",
+                  color: "#aaa",
+                  marginTop: "0.45rem",
+                }}
+              >
+                Interactive map/video sync: unavailable in current public timing
+                feed. Timeline still highlights major race-control events.
+              </div>
+              <div
+                style={{
+                  maxHeight: 140,
+                  overflow: "auto",
+                  marginTop: "0.4rem",
+                }}
+              >
+                {timeline.slice(0, 20).map((item, idx) => (
+                  <div
+                    key={`timeline-${idx}`}
+                    style={{
+                      fontSize: "0.75rem",
+                      borderBottom: "1px solid #222",
+                      padding: "0.2rem 0",
+                    }}
+                  >
+                    L{item.lap ?? "--"} · {item.category} · {item.message}
+                  </div>
+                ))}
+              </div>
             </div>
-            <div
-              style={{ maxHeight: 140, overflow: "auto", marginTop: "0.4rem" }}
-            >
-              {timeline.slice(0, 20).map((item, idx) => (
-                <div
-                  key={`timeline-${idx}`}
-                  style={{
-                    fontSize: "0.75rem",
-                    borderBottom: "1px solid #222",
-                    padding: "0.2rem 0",
-                  }}
-                >
-                  L{item.lap ?? "--"} · {item.category} · {item.message}
-                </div>
-              ))}
-            </div>
-          </div>
+          ) : (
+            <div />
+          )}
 
-          <div>
-            <div style={tinyLabel}>Setup And Configuration Insights</div>
-            <div
-              style={{
-                fontSize: "0.8rem",
-                color: "#aaa",
-                marginTop: "0.45rem",
-              }}
-            >
-              {setupNotes}
+          {visible.has("setup") ? (
+            <div>
+              <div style={tinyLabel}>Setup And Configuration Insights</div>
+              <div
+                style={{
+                  fontSize: "0.8rem",
+                  color: "#aaa",
+                  marginTop: "0.45rem",
+                }}
+              >
+                {setupNotes}
+              </div>
+              <div
+                style={{
+                  marginTop: "0.45rem",
+                  fontSize: "0.78rem",
+                  color: "#999",
+                }}
+              >
+                Mechanical setup optimization is currently presented as
+                unavailable to avoid inventing non-existent telemetry channels.
+              </div>
             </div>
-            <div
-              style={{
-                marginTop: "0.45rem",
-                fontSize: "0.78rem",
-                color: "#999",
-              }}
-            >
-              Mechanical setup optimization is currently presented as
-              unavailable to avoid inventing non-existent telemetry channels.
-            </div>
-          </div>
+          ) : (
+            <div />
+          )}
         </div>
-      </section>
+        </section>
+      )}
     </div>
   );
 };
