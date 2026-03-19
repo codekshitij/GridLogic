@@ -1,34 +1,55 @@
 import React, { useMemo } from "react";
 import { useRaceMeta, useRaceAnalytics } from "../../hooks/useRaceData";
 import DriverPanel from "../../components/DriverPanel";
-import RaceAnalyticsDashboard from "./RaceAnalyticsDashboard";
+import PaceChart from "./PaceChart";
+import GapChart from "./GapChart";
+import FastestLapCard from "../../components/FastestLapCard";
+import { useWorkerizedData } from "./useWorkerizedData";
 
 const LapTimeController = ({
   year,
   gp,
   selectedDrivers,
   onSelectionChange,
-  visibleSections,
 }) => {
   const meta = useRaceMeta(year, gp);
   const analytics = useRaceAnalytics(year, gp);
 
-  const allDrivers = useMemo(() => {
-    return meta.data?.drivers || [];
-  }, [meta.data]);
+
+  const allDrivers = useMemo(() => meta.data?.drivers || [], [meta.data]);
+  const driversToShow = selectedDrivers.length ? selectedDrivers : allDrivers.slice(0, 2).map((d) => d.code);
+
+  // Use web worker for gap data transformation
+  const gapSeries = useWorkerizedData(
+    new URL("./gap.worker.js", import.meta.url),
+    {
+      gapData: analytics.data?.gaps_and_intervals,
+      selectedDrivers: driversToShow,
+    },
+    [analytics.data, driversToShow]
+  ) || [];
+
+  // Use web worker for pace chart data transformation (per-lap mode)
+  const paceChartData = useWorkerizedData(
+    new URL("./pace.worker.js", import.meta.url),
+    {
+      paceData: analytics.data?.lap_times_and_splits?.drivers,
+      selectedDrivers: driversToShow,
+      mode: "per-lap",
+    },
+    [analytics.data, driversToShow]
+  )?.chartData || [];
+  // Fastest lap info
+  const globalFastest = analytics.data?.lap_times_and_splits?.global_fastest;
+
 
   if (meta.isLoading || analytics.isLoading) {
     return <div style={styles.loading}>SYNCING_RACE_METRICS...</div>;
   }
-
   if (meta.error)
-    return (
-      <div style={styles.error}>CONNECTION_LOST: {meta.error.message}</div>
-    );
+    return <div style={styles.error}>CONNECTION_LOST: {meta.error.message}</div>;
   if (analytics.error)
-    return (
-      <div style={styles.error}>ANALYTICS_ERROR: {analytics.error.message}</div>
-    );
+    return <div style={styles.error}>ANALYTICS_ERROR: {analytics.error.message}</div>;
 
   return (
     <div style={styles.container}>
@@ -39,16 +60,26 @@ const LapTimeController = ({
         onClear={() => onSelectionChange([])}
       />
 
-      {analytics.data ? (
-        <RaceAnalyticsDashboard
-          analytics={analytics.data}
-          selectedDrivers={selectedDrivers}
-          allDrivers={allDrivers}
-          visibleSections={visibleSections}
-        />
-      ) : (
-        <div style={styles.emptyState}>NO ANALYTICS DATA AVAILABLE</div>
+      {/* Fastest Lap Card */}
+      {globalFastest && (
+        <div style={{ marginBottom: "1.5rem", maxWidth: 320 }}>
+          <FastestLapCard
+            driver={globalFastest.driver}
+            time={globalFastest.lap_time_s}
+            lap={globalFastest.lap}
+          />
+        </div>
       )}
+
+      {/* Pace Chart */}
+      <div style={{ marginBottom: "2rem" }}>
+        <PaceChart data={paceChartData} selectedDrivers={driversToShow} />
+      </div>
+
+      {/* Gap Chart */}
+      <div style={{ marginBottom: "2rem" }}>
+        <GapChart data={gapSeries} selectedDrivers={driversToShow} />
+      </div>
     </div>
   );
 };

@@ -6,6 +6,12 @@ import numpy as np
 
 class F1DataProcessor:
     def __init__(self, cache_dir: str | None = None):
+        """
+        Initializes the F1DataProcessor, sets up the cache directory for fastf1, and enables caching.
+        
+        Args:
+            cache_dir (str | None): Optional path to a directory for caching F1 data.
+        """
         if cache_dir is None:
             # Consistent cache pathing
             cache_path = Path(__file__).resolve().parent.parent / "data_cache"
@@ -15,6 +21,15 @@ class F1DataProcessor:
         fastf1.Cache.enable_cache(str(cache_path))
 
     def get_minimal_meta(self, year: int, gp: str) -> Dict:
+        """
+        Fetches basic session metadata (drivers, total laps, event name, fastest lap) without loading heavy telemetry/lap data.
+        
+        Args:
+            year (int): Season year.
+            gp (str): Grand Prix name or location.
+        Returns:
+            Dict: drivers list, total_laps, event_name, fastest_lap
+        """
         """
         NEW: Fetches only the entry list and race basics.
         Extremely fast because it skips lap/telemetry loading.
@@ -53,6 +68,16 @@ class F1DataProcessor:
 
     def get_selective_telemetry(self, year: int, gp: str, driver_codes: List[str]) -> Dict:
         """
+        Fetches lap times for specific drivers, skipping full telemetry for performance.
+        
+        Args:
+            year (int): Season year.
+            gp (str): Grand Prix name.
+            driver_codes (List[str]): List of driver abbreviations.
+        Returns:
+            Dict: Mapping driver codes to their lap numbers and lap times.
+        """
+        """
         NEW: Fetches lap times only for specific drivers.
         Used to power the Pace Evolution chart dynamically.
         """
@@ -72,6 +97,16 @@ class F1DataProcessor:
         return pace_evolution
 
     def _get_session(self, year: int, gp: str, session_type: str = 'R'):
+        """
+        Helper to retrieve and load a fastf1 session.
+        
+        Args:
+            year (int): Season year.
+            gp (str): Grand Prix name.
+            session_type (str): Session type (default 'R' for Race).
+        Returns:
+            fastf1 session object.
+        """
         """Helper to load and load telemetry."""
         session = fastf1.get_session(year, gp, session_type)
         session.load()
@@ -79,6 +114,14 @@ class F1DataProcessor:
 
     @staticmethod
     def _td_to_seconds(value):
+        """
+        Converts a timedelta or numeric value to float seconds.
+        
+        Args:
+            value (timedelta or numeric): The time value to convert.
+        Returns:
+            float or None
+        """
         if value is None or pd.isna(value):
             return None
         if hasattr(value, "total_seconds"):
@@ -86,7 +129,39 @@ class F1DataProcessor:
         return float(value)
 
     @staticmethod
+    def _format_time_min_sec(seconds):
+        """
+        Formats a float (seconds) as 'M:SS.sss' string.
+        
+        Args:
+            seconds (float): The time in seconds.
+        Returns:
+            str or None
+        """
+        """
+        Converts a float (seconds) to 'M:SS.sss' string (e.g., 1:23.456).
+        Returns None if input is None or not a number.
+        """
+        if seconds is None or pd.isna(seconds):
+            return None
+        try:
+            minutes = int(seconds // 60)
+            secs = seconds % 60
+            return f"{minutes}:{secs:06.3f}"
+        except Exception:
+            return None
+
+    @staticmethod
     def _safe_float(value, default=None):
+        """
+        Safely casts a value to float, returns default if fails.
+        
+        Args:
+            value: Value to cast.
+            default (float | None): Value to return on failure.
+        Returns:
+            float or default
+        """
         if value is None or pd.isna(value):
             return default
         try:
@@ -96,6 +171,15 @@ class F1DataProcessor:
 
     @staticmethod
     def _safe_int(value, default=None):
+        """
+        Safely casts a value to int, returns default if fails.
+        
+        Args:
+            value: Value to cast.
+            default (int | None): Value to return on failure.
+        Returns:
+            int or default
+        """
         if value is None or pd.isna(value):
             return default
         try:
@@ -104,6 +188,14 @@ class F1DataProcessor:
             return default
 
     def _build_driver_reference(self, session) -> Dict[str, Dict]:
+        """
+        Builds a reference dict of driver details from session results.
+        
+        Args:
+            session: fastf1 session object.
+        Returns:
+            Dict mapping driver codes to driver info.
+        """
         drivers = {}
         for _, row in session.results.iterrows():
             code = str(row.get('Abbreviation', ''))
@@ -119,6 +211,14 @@ class F1DataProcessor:
         return drivers
 
     def _prepare_lap_frame(self, laps: pd.DataFrame) -> pd.DataFrame:
+        """
+        Cleans and processes laps DataFrame, adds columns for analysis.
+        
+        Args:
+            laps (pd.DataFrame): Raw laps data from fastf1.
+        Returns:
+            Processed pd.DataFrame
+        """
         frame = laps.copy()
         frame = frame[~frame['LapTime'].isna()].copy()
         frame['LapTimeSeconds'] = frame['LapTime'].dt.total_seconds()
@@ -131,6 +231,14 @@ class F1DataProcessor:
         return frame
 
     def _build_lap_times_payload(self, laps_df: pd.DataFrame) -> Dict:
+        """
+        Aggregates lap time, sector, tire, and status data for all drivers.
+        
+        Args:
+            laps_df (pd.DataFrame): Processed laps DataFrame.
+        Returns:
+            Dict with lap history and fastest lap info.
+        """
         lap_records = []
         for lap_no, group in laps_df.groupby('LapNumber'):
             idx = group['LapTimeSeconds'].idxmin()
@@ -174,6 +282,14 @@ class F1DataProcessor:
         }
 
     def _build_gap_payload(self, laps_df: pd.DataFrame) -> Dict:
+        """
+        Calculates gap to leader and interval to car ahead for each driver/lap.
+        
+        Args:
+            laps_df (pd.DataFrame): Processed laps DataFrame.
+        Returns:
+            Dict by lap with leader and car gaps.
+        """
         gaps = {}
         for lap_no, group in laps_df.groupby('LapNumber'):
             leader_row = group[group['Position'] == 1]
@@ -201,6 +317,14 @@ class F1DataProcessor:
         return {"by_lap": gaps}
 
     def _build_tire_payload(self, laps_df: pd.DataFrame) -> Dict:
+        """
+        Analyzes tire stints, average pace, and wear for each compound.
+        
+        Args:
+            laps_df (pd.DataFrame): Processed laps DataFrame.
+        Returns:
+            Dict with stint and compound summaries.
+        """
         stints = []
         for (driver, stint, compound), group in laps_df.groupby(['Driver', 'Stint', 'Compound']):
             ordered = group.sort_values('LapNumber')
@@ -239,6 +363,15 @@ class F1DataProcessor:
         }
 
     def _build_pit_payload(self, laps_df: pd.DataFrame, drivers_ref: Dict[str, Dict]) -> Dict:
+        """
+        Identifies pit events, estimates pit loss, summarizes team pit performance.
+        
+        Args:
+            laps_df (pd.DataFrame): Processed laps DataFrame.
+            drivers_ref (Dict): Driver reference info.
+        Returns:
+            Dict with pit events, strategies, team performance.
+        """
         pit_events = []
         stop_counts = {}
 
@@ -287,6 +420,14 @@ class F1DataProcessor:
         }
 
     def _build_undercut_overcut_payload(self, laps_df: pd.DataFrame) -> List[Dict]:
+        """
+        Detects undercut/overcut battles by comparing pit windows and position changes.
+        
+        Args:
+            laps_df (pd.DataFrame): Processed laps DataFrame.
+        Returns:
+            List of undercut/overcut events.
+        """
         driver_pit_laps = {}
         for driver, group in laps_df.groupby('Driver'):
             laps = group[group['PitOutFlag']]['LapNumber'].dropna().astype(int).tolist()
@@ -345,6 +486,18 @@ class F1DataProcessor:
         return events
 
     def _build_driver_comparison_payload(self, laps_df: pd.DataFrame, drivers_ref: Dict[str, Dict], session, year: int, gp: str) -> Dict:
+        """
+        Generates driver comparison metrics, consistency, overtakes, teammate head-to-head.
+        
+        Args:
+            laps_df (pd.DataFrame): Processed laps DataFrame.
+            drivers_ref (Dict): Driver reference info.
+            session: fastf1 session object.
+            year (int): Season year.
+            gp (str): Grand Prix name.
+        Returns:
+            Dict with driver metrics and session breakdown.
+        """
         comparison = []
         for driver, group in laps_df.groupby('Driver'):
             group = group.sort_values('LapNumber')
@@ -409,6 +562,15 @@ class F1DataProcessor:
         }
 
     def _build_weather_payload(self, session, laps_df: pd.DataFrame) -> Dict:
+        """
+        Extracts weather data and correlates it to laps for impact analysis.
+        
+        Args:
+            session: fastf1 session object.
+            laps_df (pd.DataFrame): Processed laps DataFrame.
+        Returns:
+            Dict with weather samples and lap impacts.
+        """
         weather_rows = []
         weather = session.weather_data if hasattr(session, 'weather_data') else pd.DataFrame()
         if weather is not None and not weather.empty:
@@ -453,6 +615,15 @@ class F1DataProcessor:
         }
 
     def _build_fuel_payload(self, laps_df: pd.DataFrame, total_laps: int) -> Dict:
+        """
+        Models fuel burn, remaining fuel, and detects lift-and-coast behavior.
+        
+        Args:
+            laps_df (pd.DataFrame): Processed laps DataFrame.
+            total_laps (int): Total race laps.
+        Returns:
+            Dict with fuel traces and strategy hints.
+        """
         estimated_burn_kg_per_lap = 1.8
         starting_fuel_kg = round(total_laps * estimated_burn_kg_per_lap * 1.05, 2)
         by_driver = {}
@@ -503,6 +674,14 @@ class F1DataProcessor:
         }
 
     def _build_replay_setup_payload(self, session) -> Dict:
+        """
+        Collects race control messages and provides replay/setup metadata.
+        
+        Args:
+            session: fastf1 session object.
+        Returns:
+            Dict with timeline and setup info.
+        """
         timeline = []
         try:
             messages = session.race_control_messages
@@ -531,6 +710,15 @@ class F1DataProcessor:
         }
 
     def get_race_analytics(self, year: int, gp: str) -> Dict:
+        """
+        Main orchestrator: aggregates all analytics (lap times, gaps, tires, pits, etc.) into a master dict.
+        
+        Args:
+            year (int): Season year.
+            gp (str): Grand Prix name.
+        Returns:
+            Dict with full race analytics.
+        """
         session = fastf1.get_session(year, gp, 'R')
         session.load(laps=True, telemetry=False, weather=True, messages=True)
 

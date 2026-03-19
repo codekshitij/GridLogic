@@ -188,7 +188,7 @@ const TopNavbar = ({ selectedYear, onYearChange, selectedGP, onGPChange, availab
           <div style={styles.controlGroup}>
             <span style={styles.controlLabel}>Year</span>
             <select
-              value={selectedYear}
+              value={selectedYear ?? ""}
               onChange={(e) => onYearChange(Number(e.target.value))}
               style={styles.select}
             >
@@ -198,7 +198,7 @@ const TopNavbar = ({ selectedYear, onYearChange, selectedGP, onGPChange, availab
           <div style={styles.controlGroupLast}>
             <span style={styles.controlLabel}>GP</span>
             <select
-              value={selectedGP}
+              value={selectedGP ?? ""}
               onChange={(e) => onGPChange(e.target.value)}
               style={styles.select}
             >
