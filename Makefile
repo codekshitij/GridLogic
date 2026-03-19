@@ -1,4 +1,4 @@
-.PHONY: dev frontend backend format format-check
+.PHONY: dev frontend backend lint format format-check
 
 dev:
 	./start-dev.sh
@@ -8,6 +8,9 @@ frontend:
 
 backend:
 	cd backend && ../venv/bin/python -m uvicorn src.main:app --reload
+
+lint:
+	cd frontend && bun run lint
 
 format:
 	cd frontend && bun run format
