@@ -14,12 +14,13 @@ import { getDriverColor } from "../../theme/f1Colors";
 const PaceChart = ({ data, selectedDrivers }) => {
   // Performance check for M3 Pro: Disable heavy animations if many drivers are selected
 
-
   // Custom X-axis ticks:
   // - Laps 2-10: increment by 2
   // - Laps 12-30: increment by 4
   // - Laps 32-end: increment by 2
-  const allLaps = data.map((d) => d.lap).filter((lap) => typeof lap === "number");
+  const allLaps = data
+    .map((d) => d.lap)
+    .filter((lap) => typeof lap === "number");
   const maxLap = Math.max(...allLaps, 0);
   let lapTicks = [];
   for (let i = 2; i <= 10 && i <= maxLap; i += 2) lapTicks.push(i);
@@ -76,7 +77,13 @@ const PaceChart = ({ data, selectedDrivers }) => {
               interval={0}
               ticks={lapTicks}
               tick={{ angle: 0, textAnchor: "middle", dy: 10 }}
-              label={{ value: "Lap number", position: "insideBottom", offset: -10, fill: "#bbb", fontSize: 15 }}
+              label={{
+                value: "Lap number",
+                position: "insideBottom",
+                offset: -10,
+                fill: "#bbb",
+                fontSize: 15,
+              }}
             />
             <YAxis
               domain={yDomain}
@@ -87,17 +94,30 @@ const PaceChart = ({ data, selectedDrivers }) => {
               tickFormatter={(_val) => {
                 // Use the first driver's formatted string for the tick if available
                 if (!data.length || !selectedDrivers.length) return "";
-                const code = typeof selectedDrivers[0] === "object" ? selectedDrivers[0].code : selectedDrivers[0];
+                const code =
+                  typeof selectedDrivers[0] === "object"
+                    ? selectedDrivers[0].code
+                    : selectedDrivers[0];
                 // Find the closest data point for this tick value
                 let closest = data.reduce((prev, curr) => {
                   const t = curr[`${code}_time`];
                   if (typeof t !== "number" || isNaN(t)) return prev;
-                  if (Math.abs(t - _val) < Math.abs((prev[`${code}_time`] ?? 0) - _val)) return curr;
+                  if (
+                    Math.abs(t - _val) <
+                    Math.abs((prev[`${code}_time`] ?? 0) - _val)
+                  )
+                    return curr;
                   return prev;
                 }, {});
                 return closest[`${code}_time_str`] || "";
               }}
-              label={{ value: "Lap time", angle: -90, position: "insideLeft", fill: "#bbb", fontSize: 15 }}
+              label={{
+                value: "Lap time",
+                angle: -90,
+                position: "insideLeft",
+                fill: "#bbb",
+                fontSize: 15,
+              }}
             />
             <Tooltip
               contentStyle={styles.tooltip}
@@ -105,7 +125,7 @@ const PaceChart = ({ data, selectedDrivers }) => {
               cursor={{ stroke: "#333", strokeWidth: 0.7 }}
               formatter={(value, name, props) => {
                 // Use the formatted string if available
-                const code = name.replace('_time', '');
+                const code = name.replace("_time", "");
                 const formatted = props.payload[`${code}_time_str`];
                 return [formatted || value, "Lap time"];
               }}

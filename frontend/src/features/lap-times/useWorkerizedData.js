@@ -13,7 +13,7 @@ export function useWorkerizedData(workerUrl, input, deps = []) {
     return () => {
       workerRef.current.terminate();
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
 
   return result;

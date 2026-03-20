@@ -3,11 +3,16 @@ self.onmessage = (e) => {
   function formatLapTime(val) {
     if (typeof val !== "number" || isNaN(val)) return "";
     const min = Math.floor(val / 60);
-    const sec = (val % 60).toFixed(3).padStart(6, '0');
+    const sec = (val % 60).toFixed(3).padStart(6, "0");
     return `${min}:${sec}`;
   }
 
-  const { paceData, selectedDrivers, mode = "per-lap", bucketSize = 5 } = e.data;
+  const {
+    paceData,
+    selectedDrivers,
+    mode = "per-lap",
+    bucketSize = 5,
+  } = e.data;
   if (!paceData || !selectedDrivers.length) return;
 
   let chartData = [];
@@ -59,7 +64,9 @@ self.onmessage = (e) => {
         const slice = driverLaps.slice(i, i + bucketSize);
         const sum = slice.reduce((acc, curr) => acc + curr.lap_time_s, 0);
         if (slice.length > 0) {
-          lapEntry[`${code}_time`] = parseFloat((sum / slice.length).toFixed(3));
+          lapEntry[`${code}_time`] = parseFloat(
+            (sum / slice.length).toFixed(3),
+          );
         }
       });
       chartData.push(lapEntry);

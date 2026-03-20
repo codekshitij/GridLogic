@@ -10,7 +10,6 @@ const navLinks = [
 
 const years = [2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026];
 
-
 const styles = {
   header: {
     position: "fixed",
@@ -157,7 +156,13 @@ const styles = {
   },
 };
 
-const TopNavbar = ({ selectedYear, onYearChange, selectedGP, onGPChange, availableGPs = [] }) => {
+const TopNavbar = ({
+  selectedYear,
+  onYearChange,
+  selectedGP,
+  onGPChange,
+  availableGPs = [],
+}) => {
   return (
     <header style={styles.header}>
       <div style={styles.container}>
@@ -192,7 +197,11 @@ const TopNavbar = ({ selectedYear, onYearChange, selectedGP, onGPChange, availab
               onChange={(e) => onYearChange(Number(e.target.value))}
               style={styles.select}
             >
-              {years.map((y) => <option key={y} value={y} style={styles.option}>{y}</option>)}
+              {years.map((y) => (
+                <option key={y} value={y} style={styles.option}>
+                  {y}
+                </option>
+              ))}
             </select>
           </div>
           <div style={styles.controlGroupLast}>
@@ -202,7 +211,11 @@ const TopNavbar = ({ selectedYear, onYearChange, selectedGP, onGPChange, availab
               onChange={(e) => onGPChange(e.target.value)}
               style={styles.select}
             >
-              {availableGPs.map((gp) => <option key={gp} value={gp} style={styles.option}>{gp}</option>)}
+              {availableGPs.map((gp) => (
+                <option key={gp} value={gp} style={styles.option}>
+                  {gp}
+                </option>
+              ))}
             </select>
           </div>
         </div>

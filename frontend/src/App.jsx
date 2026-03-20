@@ -6,7 +6,6 @@ import RaceControlPage from "./features/race-control/RaceControlPage";
 import StrategyPage from "./features/strategy/StrategyPage";
 import TechnicalPage from "./features/technical/TechnicalPage";
 
-
 import { useEffect } from "react";
 import axios from "axios";
 
@@ -20,9 +19,7 @@ function App() {
     // Fetch races for the selected year from your backend
     const fetchRaces = async () => {
       try {
-        const { data } = await axios.get(
-          `http://127.0.0.1:8000/races/${year}`,
-        );
+        const { data } = await axios.get(`http://127.0.0.1:8000/races/${year}`);
         setAvailableGPs(data.events);
         // Auto-select the first race if the current selection isn't in the new list
         if (!data.events.includes(gp)) {

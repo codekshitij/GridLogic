@@ -11,7 +11,9 @@ const RaceControlPage = ({ year, gp }) => {
 
   if (analytics.error) {
     return (
-      <div style={styles.error}>RACE_CONTROL_ERROR: {analytics.error.message}</div>
+      <div style={styles.error}>
+        RACE_CONTROL_ERROR: {analytics.error.message}
+      </div>
     );
   }
 

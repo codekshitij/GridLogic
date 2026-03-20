@@ -15,41 +15,47 @@ const LapTimeController = ({
   const meta = useRaceMeta(year, gp);
   const analytics = useRaceAnalytics(year, gp);
 
-
   const allDrivers = useMemo(() => meta.data?.drivers || [], [meta.data]);
-  const driversToShow = selectedDrivers.length ? selectedDrivers : allDrivers.slice(0, 2).map((d) => d.code);
+  const driversToShow = selectedDrivers.length
+    ? selectedDrivers
+    : allDrivers.slice(0, 2).map((d) => d.code);
 
   // Use web worker for gap data transformation
-  const gapSeries = useWorkerizedData(
-    new URL("./gap.worker.js", import.meta.url),
-    {
-      gapData: analytics.data?.gaps_and_intervals,
-      selectedDrivers: driversToShow,
-    },
-    [analytics.data, driversToShow]
-  ) || [];
+  const gapSeries =
+    useWorkerizedData(
+      new URL("./gap.worker.js", import.meta.url),
+      {
+        gapData: analytics.data?.gaps_and_intervals,
+        selectedDrivers: driversToShow,
+      },
+      [analytics.data, driversToShow],
+    ) || [];
 
   // Use web worker for pace chart data transformation (per-lap mode)
-  const paceChartData = useWorkerizedData(
-    new URL("./pace.worker.js", import.meta.url),
-    {
-      paceData: analytics.data?.lap_times_and_splits?.drivers,
-      selectedDrivers: driversToShow,
-      mode: "per-lap",
-    },
-    [analytics.data, driversToShow]
-  )?.chartData || [];
+  const paceChartData =
+    useWorkerizedData(
+      new URL("./pace.worker.js", import.meta.url),
+      {
+        paceData: analytics.data?.lap_times_and_splits?.drivers,
+        selectedDrivers: driversToShow,
+        mode: "per-lap",
+      },
+      [analytics.data, driversToShow],
+    )?.chartData || [];
   // Fastest lap info
   const globalFastest = analytics.data?.lap_times_and_splits?.global_fastest;
-
 
   if (meta.isLoading || analytics.isLoading) {
     return <div style={styles.loading}>SYNCING_RACE_METRICS...</div>;
   }
   if (meta.error)
-    return <div style={styles.error}>CONNECTION_LOST: {meta.error.message}</div>;
+    return (
+      <div style={styles.error}>CONNECTION_LOST: {meta.error.message}</div>
+    );
   if (analytics.error)
-    return <div style={styles.error}>ANALYTICS_ERROR: {analytics.error.message}</div>;
+    return (
+      <div style={styles.error}>ANALYTICS_ERROR: {analytics.error.message}</div>
+    );
 
   return (
     <div style={styles.container}>
@@ -115,4 +121,3 @@ const styles = {
 };
 
 export default LapTimeController;
-

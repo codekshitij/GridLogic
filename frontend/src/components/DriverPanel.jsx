@@ -142,8 +142,8 @@ const styles = {
     boxShadow: "0 0 10px 2px #fff8, 0 0 8px 0 #e10600",
     opacity: 0.95,
     zIndex: 1,
-    transition: "background 0.18s, box-shadow 0.18s"
-  }
+    transition: "background 0.18s, box-shadow 0.18s",
+  },
 };
 
 export default DriverPanel;
