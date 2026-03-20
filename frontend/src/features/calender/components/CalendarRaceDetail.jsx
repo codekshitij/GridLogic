@@ -112,11 +112,7 @@ const CalendarRaceDetail = ({
         ))}
       </div>
 
-      <TrackMapCard
-        trackIntel={trackIntel}
-        isLoading={trackIntelLoading}
-        error={trackIntelError}
-      />
+      <TrackMapCard eventName={event?.EventName} />
     </section>
   );
 };

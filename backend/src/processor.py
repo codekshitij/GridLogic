@@ -100,26 +100,7 @@ class F1DataProcessor:
                     "total_laps": None,
                     "circuit_length_km": None,
                     "race_distance_km": None,
-                    "rotation_deg": None,
-                    "corners": [],
-                    "marshal_lights": [],
-                    "marshal_sectors": [],
                 }
-
-        def _markers_to_records(markers_df: pd.DataFrame | None) -> List[Dict]:
-            if markers_df is None or markers_df.empty:
-                return []
-            rows = []
-            for _, marker in markers_df.iterrows():
-                rows.append({
-                    "x": self._safe_float(marker.get("X")),
-                    "y": self._safe_float(marker.get("Y")),
-                    "number": self._safe_int(marker.get("Number")),
-                    "letter": None if pd.isna(marker.get("Letter")) else str(marker.get("Letter")),
-                    "angle": self._safe_float(marker.get("Angle")),
-                    "distance_m": self._safe_float(marker.get("Distance")),
-                })
-            return rows
 
         circuit_info = None
         try:
@@ -188,10 +169,6 @@ class F1DataProcessor:
             "total_laps": total_laps,
             "circuit_length_km": circuit_length_km,
             "race_distance_km": race_distance_km,
-            "rotation_deg": self._safe_float(getattr(circuit_info, 'rotation', None) if circuit_info is not None else None),
-            "corners": _markers_to_records(getattr(circuit_info, 'corners', None) if circuit_info is not None else None),
-            "marshal_lights": _markers_to_records(getattr(circuit_info, 'marshal_lights', None) if circuit_info is not None else None),
-            "marshal_sectors": _markers_to_records(getattr(circuit_info, 'marshal_sectors', None) if circuit_info is not None else None),
         }
 
     def get_selective_telemetry(self, year: int, gp: str, driver_codes: List[str]) -> Dict:
