@@ -78,6 +78,122 @@ class F1DataProcessor:
             "race_winner": winner_payload
         }
 
+    def get_track_intel(self, year: int, gp: str) -> Dict:
+        """
+        Fetch static track intel from previous season by default.
+        No multi-year fallback is applied.
+        """
+        source_year = year - 1
+        session = fastf1.get_session(source_year, gp, 'R')
+
+        try:
+            session.load(laps=True, telemetry=True, weather=False, messages=False)
+        except Exception:
+            try:
+                session.load(laps=False, telemetry=False, weather=False, messages=False)
+            except Exception:
+                return {
+                    "year": year,
+                    "gp": gp,
+                    "intel_source_year": source_year,
+                    "event_name": gp,
+                    "total_laps": None,
+                    "circuit_length_km": None,
+                    "race_distance_km": None,
+                    "rotation_deg": None,
+                    "corners": [],
+                    "marshal_lights": [],
+                    "marshal_sectors": [],
+                }
+
+        def _markers_to_records(markers_df: pd.DataFrame | None) -> List[Dict]:
+            if markers_df is None or markers_df.empty:
+                return []
+            rows = []
+            for _, marker in markers_df.iterrows():
+                rows.append({
+                    "x": self._safe_float(marker.get("X")),
+                    "y": self._safe_float(marker.get("Y")),
+                    "number": self._safe_int(marker.get("Number")),
+                    "letter": None if pd.isna(marker.get("Letter")) else str(marker.get("Letter")),
+                    "angle": self._safe_float(marker.get("Angle")),
+                    "distance_m": self._safe_float(marker.get("Distance")),
+                })
+            return rows
+
+        circuit_info = None
+        try:
+            circuit_info = session.get_circuit_info()
+        except Exception:
+            circuit_info = None
+
+        total_laps = None
+        try:
+            if hasattr(session, 'total_laps'):
+                candidate = int(session.total_laps)
+                total_laps = candidate if candidate > 0 else None
+        except Exception:
+            total_laps = None
+
+        circuit_length_km = None
+        try:
+            if hasattr(session, 'laps') and session.laps is not None and not session.laps.empty:
+                fastest_lap = session.laps.pick_fastest()
+                if fastest_lap is not None:
+                    telemetry = fastest_lap.get_telemetry()
+                    if telemetry is not None and not telemetry.empty and 'Distance' in telemetry:
+                        distance_m = self._safe_float(telemetry['Distance'].max())
+                        if distance_m and distance_m > 0:
+                            circuit_length_km = round(distance_m / 1000.0, 3)
+        except Exception:
+            circuit_length_km = None
+
+        if circuit_length_km is None and circuit_info is not None:
+            try:
+                marker_sets = [
+                    getattr(circuit_info, 'corners', None),
+                    getattr(circuit_info, 'marshal_lights', None),
+                    getattr(circuit_info, 'marshal_sectors', None),
+                ]
+                max_distance = None
+                for marker_df in marker_sets:
+                    if marker_df is None or marker_df.empty or 'Distance' not in marker_df:
+                        continue
+                    candidate = self._safe_float(marker_df['Distance'].max())
+                    if candidate is None:
+                        continue
+                    if max_distance is None or candidate > max_distance:
+                        max_distance = candidate
+                if max_distance and max_distance > 0:
+                    circuit_length_km = round(max_distance / 1000.0, 3)
+            except Exception:
+                circuit_length_km = None
+
+        race_distance_km = None
+        if circuit_length_km is not None and total_laps is not None:
+            race_distance_km = round(circuit_length_km * total_laps, 3)
+
+        event_name = gp
+        try:
+            if hasattr(session, 'event') and session.event is not None:
+                event_name = str(session.event.get('EventName', gp))
+        except Exception:
+            event_name = gp
+
+        return {
+            "year": year,
+            "gp": gp,
+            "intel_source_year": source_year,
+            "event_name": event_name,
+            "total_laps": total_laps,
+            "circuit_length_km": circuit_length_km,
+            "race_distance_km": race_distance_km,
+            "rotation_deg": self._safe_float(getattr(circuit_info, 'rotation', None) if circuit_info is not None else None),
+            "corners": _markers_to_records(getattr(circuit_info, 'corners', None) if circuit_info is not None else None),
+            "marshal_lights": _markers_to_records(getattr(circuit_info, 'marshal_lights', None) if circuit_info is not None else None),
+            "marshal_sectors": _markers_to_records(getattr(circuit_info, 'marshal_sectors', None) if circuit_info is not None else None),
+        }
+
     def get_selective_telemetry(self, year: int, gp: str, driver_codes: List[str]) -> Dict:
         """
         Fetches lap times for specific drivers, skipping full telemetry for performance.

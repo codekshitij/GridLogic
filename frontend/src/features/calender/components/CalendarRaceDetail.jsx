@@ -5,6 +5,7 @@ import {
   getCountdown,
   getRaceStatus,
 } from "../calendarUtils";
+import TrackIntelCard from "./TrackIntelCard";
 
 const detailItems = [
   { key: "Country", accessor: (event) => event.Country || "Unknown" },
@@ -13,7 +14,13 @@ const detailItems = [
   { key: "Session", accessor: (event) => formatEventDate(event) },
 ];
 
-const CalendarRaceDetail = ({ event, imageUrl }) => {
+const CalendarRaceDetail = ({
+  event,
+  imageUrl,
+  trackIntel,
+  trackIntelLoading,
+  trackIntelError,
+}) => {
   const countdown = getCountdown(event);
   const status = getRaceStatus(event);
 
@@ -56,21 +63,26 @@ const CalendarRaceDetail = ({ event, imageUrl }) => {
           <div className="mt-6 grid grid-cols-3 gap-3 max-w-md">
             <div className="bg-[#13131b]/80 border-b-2 border-[#ff553d] p-3">
               <p className="text-[10px] tracking-widest text-white/40 font-bold uppercase">Days</p>
-              <p className="text-2xl font-black text-white">{countdown.days}</p>
+              <p className="text-2xl font-black font-headline text-white">{countdown.days}</p>
             </div>
             <div className="bg-[#13131b]/80 border-b-2 border-[#ff553d] p-3">
               <p className="text-[10px] tracking-widest text-white/40 font-bold uppercase">Hours</p>
-              <p className="text-2xl font-black text-white">{countdown.hours}</p>
+              <p className="text-2xl font-black font-headline text-white">{countdown.hours}</p>
             </div>
             <div className="bg-[#13131b]/80 border-b-2 border-[#ff553d] p-3">
               <p className="text-[10px] tracking-widest text-white/40 font-bold uppercase">Mins</p>
-              <p className="text-2xl font-black text-white">{countdown.mins}</p>
+              <p className="text-2xl font-black font-headline text-white">{countdown.mins}</p>
             </div>
           </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <TrackIntelCard
+          trackIntel={trackIntel}
+          isLoading={trackIntelLoading}
+          error={trackIntelError}
+        />
         {detailItems.map((item) => (
           <div key={item.key} className="bg-[#1b1b24] border-l-2 border-white/10 p-5">
             <p className="text-[10px] uppercase tracking-[0.22em] text-[#ffb4a7] font-bold">

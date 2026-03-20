@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { useRaceCalendar } from "../../hooks/useRaceData";
+import { useRaceCalendar, useRaceTrackIntel } from "../../hooks/useRaceData";
 import CalendarRaceDetail from "./components/CalendarRaceDetail";
 import CalendarRaceList from "./components/CalendarRaceList";
 import { normalizeKey } from "./calendarUtils";
@@ -23,6 +23,8 @@ const CalenderPage = ({ year, selectedGP, onRaceSelect }) => {
 
     return events[0];
   }, [events, selectedGP]);
+
+  const trackIntel = useRaceTrackIntel(year, selectedEvent?.EventName);
 
   if (calendar.isLoading) {
     return (
@@ -69,7 +71,13 @@ const CalenderPage = ({ year, selectedGP, onRaceSelect }) => {
       </div>
 
       <div className="flex flex-col lg:flex-row min-h-[720px]">
-        <CalendarRaceDetail event={selectedEvent} imageUrl={selectedImage} />
+        <CalendarRaceDetail
+          event={selectedEvent}
+          imageUrl={selectedImage}
+          trackIntel={trackIntel.data}
+          trackIntelLoading={trackIntel.isLoading}
+          trackIntelError={trackIntel.error}
+        />
         <CalendarRaceList
           events={events}
           selectedRaceName={selectedEvent?.EventName}

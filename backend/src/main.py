@@ -114,6 +114,16 @@ def get_calendar(year: int):
 def get_race_meta(year: int, gp: str):
     return processor.get_minimal_meta(year, gp)
 
+@app.get("/races/{year}/{gp}/track-intel")
+def get_race_track_intel(year: int, gp: str):
+    try:
+        return processor.get_track_intel(year, gp)
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to compute track intel: {str(e)}",
+        )
+
 @app.get("/races/{year}/{gp}/telemetry")
 def get_driver_telemetry(year: int, gp: str, drivers: str = Query(...)):
     driver_list = drivers.split(',')

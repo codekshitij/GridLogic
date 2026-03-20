@@ -4,12 +4,23 @@ export default {
   theme: {
     extend: {
       colors: {
-        "kido-dark": "#0b0c10",
-        "kido-card": "#14171c",
-        "f1-red": "#e10600",
+        background: "#13131b",
+        surface: "#13131b",
+        "surface-container": "#1f1f28",
+        "surface-container-high": "#292933",
+        "surface-container-highest": "#34343e",
+        "surface-container-lowest": "#0d0d16",
+        primary: "#ffb4a7",
+        "primary-container": "#ff553d",
+        "on-primary": "#670400",
+        "on-surface": "#e4e1ee",
+        "on-surface-variant": "#eabcb4",
+        outline: "#b08780",
       },
       fontFamily: {
-        f1: ["Inter", "sans-serif"],
+        headline: ["Space Grotesk", "sans-serif"],
+        body: ["Inter", "sans-serif"],
+        label: ["Inter", "sans-serif"],
       },
     },
   },

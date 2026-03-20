@@ -59,3 +59,15 @@ export const useRaceCalendar = (year) => {
     enabled: !!year,
   });
 };
+
+export const useRaceTrackIntel = (year, gp) => {
+  return useQuery({
+    queryKey: ["raceTrackIntel", year, gp],
+    queryFn: async () => {
+      const { data } = await axios.get(`${BASE_URL}/${year}/${gp}/track-intel`);
+      return data;
+    },
+    staleTime: Infinity,
+    enabled: !!year && !!gp,
+  });
+};

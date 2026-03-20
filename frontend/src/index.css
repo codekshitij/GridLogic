@@ -3,25 +3,34 @@
 @tailwind utilities;
 
 :root {
-  --bg-dark: #050505;
-  --bg-card: #10111a;
-  --text-primary: #f5f6fa;
-  --text-secondary: #b0b3be;
-  --f1-red: #e10600;
+  --background: #13131b;
+  --surface: #13131b;
+  --surface-container: #1f1f28;
+  --surface-container-high: #292933;
+  --surface-container-highest: #34343e;
+  --surface-container-lowest: #0d0d16;
+
+  --primary: #ffb4a7;
+  --primary-container: #ff553d;
+  --on-primary: #670400;
+
+  --on-surface: #e4e1ee;
+  --on-surface-variant: #eabcb4;
+  --outline: #b08780;
+
+  --font-headline: "Space Grotesk", sans-serif;
+  --font-body: "Inter", sans-serif;
 }
 
 body {
   margin: 0;
-  background: #050505;
-  color: #f5f6fa;
-  font-family:
-    "Inter", "Roboto Mono", "SF Pro Display", "Segoe UI", "Arial", sans-serif;
-  font-feature-settings:
-    "ss01" on,
-    "zero" on;
+  background: var(--background);
+  color: var(--on-surface);
+  font-family: var(--font-body);
   font-size: 16px;
-  letter-spacing: 0.01em;
+  letter-spacing: 0.005em;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   min-height: 100vh;
 }
 
@@ -31,19 +40,36 @@ h3,
 h4,
 h5,
 h6 {
-  font-family:
-    "Inter", "Roboto Mono", "SF Pro Display", "Segoe UI", "Arial", sans-serif;
-  font-weight: 900;
+  font-family: var(--font-headline);
+  font-weight: 800;
   letter-spacing: 0.02em;
-  color: #fff;
+  color: var(--on-surface);
   margin-top: 0;
 }
 
 a {
-  color: var(--f1-red);
+  color: var(--primary-container);
   text-decoration: none;
   transition: color 0.15s;
 }
+
 a:hover {
+  color: var(--primary);
+}
+
+::selection {
+  background: var(--primary-container);
   color: #fff;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--surface-container-lowest);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary-container);
 }
