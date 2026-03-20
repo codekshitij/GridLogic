@@ -91,7 +91,19 @@ function App() {
             path="/race-control"
             element={renderPage(<RaceControlPage year={year} gp={gp} />)}
           />
-          <Route path="/calender" element={<CalenderPage year={year} />} />
+          <Route
+            path="/calender"
+            element={
+              <CalenderPage
+                year={year}
+                selectedGP={gp}
+                onRaceSelect={(raceName) => {
+                  setGp(raceName);
+                  setSelectedDrivers([]);
+                }}
+              />
+            }
+          />
           <Route path="/calendar" element={<Navigate to="/calender" replace />} />
           <Route
             path="/strategy"
