@@ -18,7 +18,9 @@ const PaceChart = ({ data, selectedDrivers }) => {
         <div style={styles.header}>
           <h3 style={styles.chartTitle}>Lap-by-Lap Pace Chart</h3>
         </div>
-        <div style={styles.emptyState}>Select at least one driver to plot pace.</div>
+        <div style={styles.emptyState}>
+          Select at least one driver to plot pace.
+        </div>
       </div>
     );
   }

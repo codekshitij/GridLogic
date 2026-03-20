@@ -15,7 +15,9 @@ const GapChart = ({ data, selectedDrivers }) => {
     return (
       <div style={styles.container}>
         <h3 style={styles.chartTitle}>Interval Gaps (Seconds)</h3>
-        <div style={styles.emptyState}>Select at least one driver to plot gaps.</div>
+        <div style={styles.emptyState}>
+          Select at least one driver to plot gaps.
+        </div>
       </div>
     );
   }

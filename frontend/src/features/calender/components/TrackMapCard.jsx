@@ -4,9 +4,7 @@ const TrackMapCard = ({ trackIntel, isLoading, error }) => {
   const { pathData, points } = useMemo(() => {
     const corners = [...(trackIntel?.corners || [])].filter(
       (corner) =>
-        corner &&
-        Number.isFinite(corner.x) &&
-        Number.isFinite(corner.y),
+        corner && Number.isFinite(corner.x) && Number.isFinite(corner.y),
     );
 
     if (!corners.length) {
@@ -45,7 +43,10 @@ const TrackMapCard = ({ trackIntel, isLoading, error }) => {
     }));
 
     const path = mappedPoints
-      .map((point, index) => `${index === 0 ? "M" : "L"}${point.x.toFixed(1)},${point.y.toFixed(1)}`)
+      .map(
+        (point, index) =>
+          `${index === 0 ? "M" : "L"}${point.x.toFixed(1)},${point.y.toFixed(1)}`,
+      )
       .join(" ");
 
     return {
@@ -72,7 +73,9 @@ const TrackMapCard = ({ trackIntel, isLoading, error }) => {
       ) : error ? (
         <p className="mt-3 text-sm text-red-300">Track map unavailable</p>
       ) : !pathData ? (
-        <p className="mt-3 text-sm text-white/60">No corner coordinates available</p>
+        <p className="mt-3 text-sm text-white/60">
+          No corner coordinates available
+        </p>
       ) : (
         <div className="mt-4 rounded-md border border-white/10 bg-[#13131b] p-3">
           <svg

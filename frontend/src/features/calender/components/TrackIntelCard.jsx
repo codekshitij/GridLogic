@@ -19,7 +19,9 @@ const TrackIntelCard = ({ trackIntel, isLoading, error }) => {
       ) : (
         <div className="mt-4 space-y-4">
           <div className="flex items-end justify-between">
-            <span className="text-xs text-white/40 uppercase font-bold">Laps</span>
+            <span className="text-xs text-white/40 uppercase font-bold">
+              Laps
+            </span>
             <span className="text-2xl font-black font-headline text-white">
               {trackIntel?.total_laps ?? "—"}
             </span>

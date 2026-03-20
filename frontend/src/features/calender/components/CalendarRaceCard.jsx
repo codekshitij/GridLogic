@@ -47,7 +47,9 @@ const CalendarRaceCard = ({ event, isActive, onClick }) => {
 
       <div className="mt-3 flex items-center justify-between text-[11px] text-white/40">
         <span>{formatEventWindow(event)}</span>
-        <span className="font-bold uppercase">{event.EventFormat || "Race"}</span>
+        <span className="font-bold uppercase">
+          {event.EventFormat || "Race"}
+        </span>
       </div>
     </button>
   );

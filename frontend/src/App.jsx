@@ -104,7 +104,10 @@ function App() {
               />
             }
           />
-          <Route path="/calendar" element={<Navigate to="/calender" replace />} />
+          <Route
+            path="/calendar"
+            element={<Navigate to="/calender" replace />}
+          />
           <Route
             path="/strategy"
             element={renderPage(

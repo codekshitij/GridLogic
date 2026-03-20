@@ -58,21 +58,34 @@ const CalendarRaceDetail = ({
             {event?.EventName || "Select a race"}
           </h2>
           <p className="mt-2 text-sm md:text-base text-white/75">
-            {event?.Location || "Unknown"}, {event?.Country || "Unknown"} • {formatEventWindow(event)}
+            {event?.Location || "Unknown"}, {event?.Country || "Unknown"} •{" "}
+            {formatEventWindow(event)}
           </p>
 
           <div className="mt-6 grid grid-cols-3 gap-3 max-w-md">
             <div className="bg-[#13131b]/80 border-b-2 border-[#ff553d] p-3">
-              <p className="text-[10px] tracking-widest text-white/40 font-bold uppercase">Days</p>
-              <p className="text-2xl font-black font-headline text-white">{countdown.days}</p>
+              <p className="text-[10px] tracking-widest text-white/40 font-bold uppercase">
+                Days
+              </p>
+              <p className="text-2xl font-black font-headline text-white">
+                {countdown.days}
+              </p>
             </div>
             <div className="bg-[#13131b]/80 border-b-2 border-[#ff553d] p-3">
-              <p className="text-[10px] tracking-widest text-white/40 font-bold uppercase">Hours</p>
-              <p className="text-2xl font-black font-headline text-white">{countdown.hours}</p>
+              <p className="text-[10px] tracking-widest text-white/40 font-bold uppercase">
+                Hours
+              </p>
+              <p className="text-2xl font-black font-headline text-white">
+                {countdown.hours}
+              </p>
             </div>
             <div className="bg-[#13131b]/80 border-b-2 border-[#ff553d] p-3">
-              <p className="text-[10px] tracking-widest text-white/40 font-bold uppercase">Mins</p>
-              <p className="text-2xl font-black font-headline text-white">{countdown.mins}</p>
+              <p className="text-[10px] tracking-widest text-white/40 font-bold uppercase">
+                Mins
+              </p>
+              <p className="text-2xl font-black font-headline text-white">
+                {countdown.mins}
+              </p>
             </div>
           </div>
         </div>
@@ -85,7 +98,10 @@ const CalendarRaceDetail = ({
           error={trackIntelError}
         />
         {detailItems.map((item) => (
-          <div key={item.key} className="bg-[#1b1b24] border-l-2 border-white/10 p-5">
+          <div
+            key={item.key}
+            className="bg-[#1b1b24] border-l-2 border-white/10 p-5"
+          >
             <p className="text-[10px] uppercase tracking-[0.22em] text-[#ffb4a7] font-bold">
               {item.key}
             </p>

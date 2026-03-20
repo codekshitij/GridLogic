@@ -104,8 +104,4 @@ export const formatEventWindow = (event) => {
 };
 
 export const normalizeKey = (value) =>
-  (value || "")
-    .toString()
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g, " ");
+  (value || "").toString().trim().toLowerCase().replace(/\s+/g, " ");
