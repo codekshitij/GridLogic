@@ -6,6 +6,7 @@ import {
   getRaceStatus,
 } from "../calendarUtils";
 import TrackIntelCard from "./TrackIntelCard";
+import TrackMapCard from "./TrackMapCard";
 
 const detailItems = [
   { key: "Country", accessor: (event) => event.Country || "Unknown" },
@@ -94,6 +95,12 @@ const CalendarRaceDetail = ({
           </div>
         ))}
       </div>
+
+      <TrackMapCard
+        trackIntel={trackIntel}
+        isLoading={trackIntelLoading}
+        error={trackIntelError}
+      />
     </section>
   );
 };
