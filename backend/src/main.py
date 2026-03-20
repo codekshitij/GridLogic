@@ -7,6 +7,16 @@ from .processor import F1DataProcessor
 from .schemas import RaceInsights, TelemetryPoint
 from typing import List, Optional
 
+
+def _to_json_safe(value):
+    if value is None:
+        return None
+    if pd.isna(value):
+        return None
+    if isinstance(value, pd.Timestamp):
+        return value.isoformat()
+    return value
+
 app = FastAPI(title="Kidō F1 Analytics Engine")
 
 # --- FastF1 Cache Setup ---
@@ -57,6 +67,48 @@ def get_races(year: int):
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to fetch schedule: {str(e)}")
+
+
+@app.get("/races/{year}/calendar")
+def get_calendar(year: int):
+    try:
+        schedule = fastf1.get_event_schedule(year)
+        races = schedule[schedule["EventFormat"] != "testing"]
+
+        fields = [
+            "RoundNumber",
+            "Country",
+            "Location",
+            "OfficialEventName",
+            "EventDate",
+            "EventName",
+            "EventFormat",
+            "Session1",
+            "Session1DateUtc",
+            "Session2",
+            "Session2DateUtc",
+            "Session3",
+            "Session3DateUtc",
+            "Session4",
+            "Session4DateUtc",
+            "Session5",
+            "Session5DateUtc",
+            "F1ApiSupport",
+        ]
+
+        events = []
+        for _, row in races.iterrows():
+            payload = {}
+            for field in fields:
+                payload[field] = _to_json_safe(row.get(field))
+            events.append(payload)
+
+        return {"year": year, "events": events}
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to fetch calendar schedule: {str(e)}",
+        )
 
 @app.get("/races/{year}/{gp}/meta")
 def get_race_meta(year: int, gp: str):

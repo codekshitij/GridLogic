@@ -47,3 +47,15 @@ export const useRaceAnalytics = (year, gp) => {
     enabled: !!year && !!gp,
   });
 };
+
+export const useRaceCalendar = (year) => {
+  return useQuery({
+    queryKey: ["raceCalendar", year],
+    queryFn: async () => {
+      const { data } = await axios.get(`${BASE_URL}/${year}/calendar`);
+      return data;
+    },
+    staleTime: Infinity,
+    enabled: !!year,
+  });
+};

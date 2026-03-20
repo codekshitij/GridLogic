@@ -3,7 +3,7 @@ import { NavLink } from "react-router-dom";
 
 const navLinks = [
   { to: "/lap-times", label: "Live Timing" },
-  { to: "/race-control", label: "Calendar" },
+  { to: "/calender", label: "Calendar" },
   { to: "/strategy", label: "Drivers" },
   { to: "/technical", label: "Teams" },
 ];

@@ -5,6 +5,7 @@ import LapTimesPage from "./features/lap-times/LapTimesPage";
 import RaceControlPage from "./features/race-control/RaceControlPage";
 import StrategyPage from "./features/strategy/StrategyPage";
 import TechnicalPage from "./features/technical/TechnicalPage";
+import CalenderPage from "./features/calender/CalenderPage";
 
 import { useEffect } from "react";
 import axios from "axios";
@@ -90,6 +91,8 @@ function App() {
             path="/race-control"
             element={renderPage(<RaceControlPage year={year} gp={gp} />)}
           />
+          <Route path="/calender" element={<CalenderPage year={year} />} />
+          <Route path="/calendar" element={<Navigate to="/calender" replace />} />
           <Route
             path="/strategy"
             element={renderPage(
