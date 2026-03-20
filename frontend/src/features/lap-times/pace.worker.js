@@ -13,7 +13,10 @@ self.onmessage = (e) => {
     mode = "per-lap",
     bucketSize = 5,
   } = e.data;
-  if (!paceData || !selectedDrivers.length) return;
+  if (!paceData || !selectedDrivers || !selectedDrivers.length) {
+    self.postMessage({ chartData: [], fastest: null });
+    return;
+  }
 
   let chartData = [];
   let fastest = null;

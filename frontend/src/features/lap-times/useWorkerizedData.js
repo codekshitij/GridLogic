@@ -6,6 +6,7 @@ export function useWorkerizedData(workerUrl, input, deps = []) {
   const [result, setResult] = useState(null);
 
   useEffect(() => {
+    setResult(null);
     workerRef.current = new Worker(workerUrl, { type: "module" });
     const handleMessage = (e) => setResult(e.data);
     workerRef.current.addEventListener("message", handleMessage);

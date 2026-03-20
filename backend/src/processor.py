@@ -59,11 +59,23 @@ class F1DataProcessor:
                 "lap": int(fastest_lap.get('LapNumber')) if not pd.isna(fastest_lap.get('LapNumber')) else 0
             }
 
+        winner_payload = None
+        winner_row = results[results['Position'] == 1]
+        if not winner_row.empty:
+            winner = winner_row.iloc[0]
+            winner_payload = {
+                "driver": str(winner.get('Abbreviation')),
+                "name": str(winner.get('FullName')),
+                "team": str(winner.get('TeamName')),
+                "number": int(winner.get('DriverNumber')) if not pd.isna(winner.get('DriverNumber')) else 0,
+            }
+
         return {
             "drivers": drivers_list,
             "total_laps": int(session.total_laps) if hasattr(session, 'total_laps') else 0,
             "event_name": str(session.event['EventName']),
-            "fastest_lap": fastest_lap_payload
+            "fastest_lap": fastest_lap_payload,
+            "race_winner": winner_payload
         }
 
     def get_selective_telemetry(self, year: int, gp: str, driver_codes: List[str]) -> Dict:

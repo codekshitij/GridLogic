@@ -11,6 +11,15 @@ import {
 import { getDriverColor } from "../../theme/f1Colors";
 
 const GapChart = ({ data, selectedDrivers }) => {
+  if (!selectedDrivers?.length) {
+    return (
+      <div style={styles.container}>
+        <h3 style={styles.chartTitle}>Interval Gaps (Seconds)</h3>
+        <div style={styles.emptyState}>Select at least one driver to plot gaps.</div>
+      </div>
+    );
+  }
+
   return (
     <div style={styles.container}>
       <h3 style={styles.chartTitle}>
@@ -116,6 +125,17 @@ const styles = {
   tooltipItem: {
     fontSize: "12px",
     fontWeight: "900",
+  },
+  emptyState: {
+    minHeight: "180px",
+    border: "1px dashed #222",
+    borderRadius: "1rem",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    color: "#666",
+    fontSize: "0.85rem",
+    fontWeight: "700",
   },
 };
 

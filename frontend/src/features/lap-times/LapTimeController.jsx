@@ -4,6 +4,7 @@ import DriverPanel from "../../components/DriverPanel";
 import PaceChart from "./PaceChart";
 import GapChart from "./GapChart";
 import FastestLapCard from "../../components/FastestLapCard";
+import RaceWinnerCard from "../../components/RaceWinnerCard";
 import { useWorkerizedData } from "./useWorkerizedData";
 
 const LapTimeController = ({
@@ -16,9 +17,7 @@ const LapTimeController = ({
   const analytics = useRaceAnalytics(year, gp);
 
   const allDrivers = useMemo(() => meta.data?.drivers || [], [meta.data]);
-  const driversToShow = selectedDrivers.length
-    ? selectedDrivers
-    : allDrivers.slice(0, 2).map((d) => d.code);
+  const driversToShow = selectedDrivers;
 
   // Use web worker for gap data transformation
   const gapSeries =
@@ -44,6 +43,7 @@ const LapTimeController = ({
     )?.chartData || [];
   // Fastest lap info
   const globalFastest = analytics.data?.lap_times_and_splits?.global_fastest;
+  const raceWinner = meta.data?.race_winner;
 
   if (meta.isLoading || analytics.isLoading) {
     return <div style={styles.loading}>SYNCING_RACE_METRICS...</div>;
@@ -66,14 +66,24 @@ const LapTimeController = ({
         onClear={() => onSelectionChange([])}
       />
 
-      {/* Fastest Lap Card */}
-      {globalFastest && (
-        <div style={{ marginBottom: "1.5rem", maxWidth: 320 }}>
-          <FastestLapCard
-            driver={globalFastest.driver}
-            time={globalFastest.lap_time_s}
-            lap={globalFastest.lap}
-          />
+      {/* Summary Cards */}
+      {(globalFastest || raceWinner) && (
+        <div style={styles.summaryCards}>
+          {globalFastest && (
+            <FastestLapCard
+              driver={globalFastest.driver}
+              time={globalFastest.lap_time_s}
+              lap={globalFastest.lap}
+            />
+          )}
+          {raceWinner && (
+            <RaceWinnerCard
+              driver={raceWinner.driver}
+              fullName={raceWinner.name}
+              team={raceWinner.team}
+              number={raceWinner.number}
+            />
+          )}
         </div>
       )}
 
@@ -92,6 +102,12 @@ const LapTimeController = ({
 
 const styles = {
   container: { display: "flex", flexDirection: "column", gap: "2rem" },
+  summaryCards: {
+    marginBottom: "1.5rem",
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(280px, 320px))",
+    gap: "1rem",
+  },
   loading: {
     padding: "5rem",
     textAlign: "center",

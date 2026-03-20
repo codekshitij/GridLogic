@@ -12,6 +12,17 @@ import {
 import { getDriverColor } from "../../theme/f1Colors";
 
 const PaceChart = ({ data, selectedDrivers }) => {
+  if (!selectedDrivers?.length) {
+    return (
+      <div style={styles.container}>
+        <div style={styles.header}>
+          <h3 style={styles.chartTitle}>Lap-by-Lap Pace Chart</h3>
+        </div>
+        <div style={styles.emptyState}>Select at least one driver to plot pace.</div>
+      </div>
+    );
+  }
+
   // Performance check for M3 Pro: Disable heavy animations if many drivers are selected
 
   // Custom X-axis ticks:
@@ -226,6 +237,17 @@ const styles = {
     fontSize: "11px",
     fontWeight: "900",
     textTransform: "uppercase",
+  },
+  emptyState: {
+    minHeight: "180px",
+    border: "1px dashed #222",
+    borderRadius: "1rem",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    color: "#666",
+    fontSize: "0.85rem",
+    fontWeight: "700",
   },
 };
 
