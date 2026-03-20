@@ -18,12 +18,12 @@ GridLogic is a comprehensive Formula 1 analytics platform that provides real-tim
 ### Technical Insights
 | Gap Analysis | Performance Metrics |
 | :---: | :---: |
-| ![Gap Chart](src/assets/gap_chart.png) | ![Lap Time Chart](src/assets/lap-time.png) |
+| ![Gap Chart](frontend/src/assets/gap_chart.png) | ![Lap Time Chart](frontend/src/assets/lap-time.png) |
 
 ### World-Class Circuits
 | Australia | Japan | Monza |
 | :---: | :---: | :---: |
-| ![Australia](public/circuits/Australia.png) | ![Japan](public/circuits/Japan.png) | ![Monza](public/circuits/Monza.png) |
+| ![Australia](frontend/public/circuits/Australia.png) | ![Japan](frontend/public/circuits/Japan.png) | ![Monza](frontend/public/circuits/Monza.png) |
 
 ---
 
