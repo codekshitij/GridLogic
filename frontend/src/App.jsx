@@ -6,9 +6,19 @@ import RaceControlPage from "./features/race-control/RaceControlPage";
 import StrategyPage from "./features/strategy/StrategyPage";
 import TechnicalPage from "./features/technical/TechnicalPage";
 import CalenderPage from "./features/calender/CalenderPage";
+import TelemetryPage from "./features/telemetry/TelemetryPage";
 
 import { useEffect } from "react";
 import axios from "axios";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { FlagIcon } from "lucide-react";
 
 function App() {
   const [year, setYear] = useState(new Date().getFullYear());
@@ -17,12 +27,10 @@ function App() {
   const [selectedDrivers, setSelectedDrivers] = useState([]);
 
   useEffect(() => {
-    // Fetch races for the selected year from your backend
     const fetchRaces = async () => {
       try {
         const { data } = await axios.get(`http://127.0.0.1:8000/races/${year}`);
         setAvailableGPs(data.events);
-        // Auto-select the first race if the current selection isn't in the new list
         if (!data.events.includes(gp)) {
           setGp(data.events[0]);
         }
@@ -50,16 +58,40 @@ function App() {
   const renderPage = (page) => {
     if (!gp) {
       return (
-        <div style={styles.emptyState}>
-          SELECT A SEASON AND GRAND PRIX TO BEGIN ANALYSIS
-        </div>
+        <Card className="mx-auto max-w-lg border-dashed">
+          <CardHeader className="text-center">
+            <div className="mx-auto mb-2 flex size-12 items-center justify-center rounded-full bg-muted">
+              <FlagIcon className="size-6 text-muted-foreground" />
+            </div>
+            <CardTitle className="font-headline text-lg tracking-wide">
+              Select a session
+            </CardTitle>
+            <CardDescription>
+              Choose a season and Grand Prix in the header to load telemetry and
+              analysis.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Alert>
+              <AlertTitle>No race selected</AlertTitle>
+              <AlertDescription>
+                Waiting for schedule data from the API. If this persists,
+                confirm the backend is running at{" "}
+                <code className="rounded bg-muted px-1 py-0.5 text-xs">
+                  http://127.0.0.1:8000
+                </code>
+                .
+              </AlertDescription>
+            </Alert>
+          </CardContent>
+        </Card>
       );
     }
     return page;
   };
 
   return (
-    <div className="min-h-screen bg-background text-on-surface font-body">
+    <div className="min-h-screen bg-background font-body text-foreground antialiased">
       <TopNavbar
         selectedYear={year}
         onYearChange={(newYear) => {
@@ -73,7 +105,7 @@ function App() {
         }}
         availableGPs={availableGPs}
       />
-      <main className="max-w-[1600px] mx-auto p-8 pt-32">
+      <main className="mx-auto max-w-[1600px] px-4 pb-10 pt-28 sm:px-6 sm:pt-32">
         <Routes>
           <Route path="/" element={<Navigate to="/lap-times" replace />} />
           <Route
@@ -85,6 +117,12 @@ function App() {
                 selectedDrivers={selectedDrivers}
                 onSelectionChange={handleDriverToggle}
               />,
+            )}
+          />
+          <Route
+            path="/telemetry"
+            element={renderPage(
+              <TelemetryPage key={`${year}-${gp}`} year={year} gp={gp} />,
             )}
           />
           <Route
@@ -136,18 +174,5 @@ function App() {
     </div>
   );
 }
-
-const styles = {
-  emptyState: {
-    padding: "15rem",
-    textAlign: "center",
-    color: "#222",
-    fontWeight: "900",
-    border: "2px dashed #111",
-    borderRadius: "2rem",
-    letterSpacing: "0.2em",
-    textTransform: "uppercase",
-  },
-};
 
 export default App;

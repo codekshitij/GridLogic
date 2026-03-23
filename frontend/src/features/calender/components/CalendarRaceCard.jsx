@@ -1,16 +1,18 @@
 import React from "react";
 import { formatEventWindow, getRaceStatus } from "../calendarUtils";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
-const statusStyles = {
-  completed: "bg-white/10 text-white/60",
-  active: "bg-[#ff553d] text-white",
-  scheduled: "bg-white/5 text-white/40",
+const statusClass = {
+  completed: "border-transparent bg-muted text-muted-foreground",
+  active: "border-racing/40 bg-racing/20 text-racing",
+  scheduled: "border-border bg-muted/50 text-muted-foreground",
 };
 
 const statusLabels = {
-  completed: "COMPLETED",
-  active: "ACTIVE",
-  scheduled: "SCHEDULED",
+  completed: "Completed",
+  active: "Active",
+  scheduled: "Scheduled",
 };
 
 const CalendarRaceCard = ({ event, isActive, onClick }) => {
@@ -20,32 +22,37 @@ const CalendarRaceCard = ({ event, isActive, onClick }) => {
     <button
       type="button"
       onClick={onClick}
-      className={`w-full text-left p-4 border-r-4 transition-all ${
+      className={cn(
+        "w-full rounded-lg border-l-4 p-4 text-left transition-all",
         isActive
-          ? "bg-[#1f1f28] border-[#ff553d] ring-1 ring-[#ff553d]/30"
-          : "bg-[#171721] border-white/10 hover:bg-[#1f1f28] hover:border-[#ff553d]/70"
-      }`}
+          ? "border-racing bg-card ring-1 ring-racing/30"
+          : "border-border/80 bg-card/60 hover:border-racing/70 hover:bg-card",
+      )}
     >
       <div className="mb-2 flex items-start justify-between gap-2">
-        <span className="text-[10px] tracking-widest font-black text-[#ffb4a7] uppercase">
+        <span className="text-[10px] font-black uppercase tracking-widest text-primary">
           Round {String(event.RoundNumber || "--").padStart(2, "0")}
         </span>
-        <span
-          className={`px-2 py-0.5 text-[9px] tracking-wider font-bold uppercase ${statusStyles[status]}`}
+        <Badge
+          variant="outline"
+          className={cn(
+            "px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider",
+            statusClass[status],
+          )}
         >
           {statusLabels[status]}
-        </span>
+        </Badge>
       </div>
 
-      <h4 className="text-sm md:text-base font-black uppercase text-white leading-tight">
+      <h4 className="text-sm font-black uppercase leading-tight text-foreground md:text-base">
         {event.EventName || "Unnamed Grand Prix"}
       </h4>
 
-      <p className="mt-1 text-xs text-white/50">
+      <p className="mt-1 text-xs text-muted-foreground">
         {event.Location || "Unknown"}, {event.Country || "Unknown"}
       </p>
 
-      <div className="mt-3 flex items-center justify-between text-[11px] text-white/40">
+      <div className="mt-3 flex items-center justify-between text-[11px] text-muted-foreground">
         <span>{formatEventWindow(event)}</span>
         <span className="font-bold uppercase">
           {event.EventFormat || "Race"}

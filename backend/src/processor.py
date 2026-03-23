@@ -1,6 +1,6 @@
 import fastf1
 import pandas as pd
-from typing import List, Dict
+from typing import List, Dict, Tuple, Optional
 from pathlib import Path
 import numpy as np
 
@@ -200,6 +200,58 @@ class F1DataProcessor:
             ]
             
         return pace_evolution
+
+    def get_lap_tire_matrix(self, year: int, gp: str, driver_codes: List[str]) -> Dict:
+        """
+        Per-lap tire compound (and lap time) for each driver — for telemetry lap picker grid.
+        """
+        session = fastf1.get_session(year, gp, "R")
+        session.load(laps=True, telemetry=False, weather=False)
+
+        total_laps = 0
+        try:
+            if hasattr(session, "total_laps") and session.total_laps:
+                total_laps = int(session.total_laps)
+        except Exception:
+            total_laps = 0
+
+        drivers_out: Dict[str, List[Dict]] = {}
+        for code in driver_codes:
+            rows: List[Dict] = []
+            try:
+                dl = session.laps.pick_driver(code)
+                for _, row in dl.iterrows():
+                    if pd.isna(row.get("LapTime")):
+                        continue
+                    lt = row.get("LapTime")
+                    lap_time_s = None
+                    if lt is not None and hasattr(lt, "total_seconds"):
+                        lap_time_s = round(float(lt.total_seconds()), 3)
+                    rows.append(
+                        {
+                            "lap": int(row["LapNumber"]),
+                            "compound": str(row.get("Compound", "UNKNOWN")),
+                            "lap_time_s": lap_time_s,
+                        }
+                    )
+                rows.sort(key=lambda x: x["lap"])
+            except Exception:
+                rows = []
+            drivers_out[str(code)] = rows
+
+        if total_laps <= 0:
+            max_lap = 0
+            for rows in drivers_out.values():
+                for r in rows:
+                    max_lap = max(max_lap, r["lap"])
+            total_laps = max_lap
+
+        return {
+            "year": year,
+            "gp": gp,
+            "total_laps": total_laps,
+            "drivers": drivers_out,
+        }
 
     def _get_session(self, year: int, gp: str, session_type: str = 'R'):
         """
@@ -915,6 +967,201 @@ class F1DataProcessor:
         tel_df = telemetry[['Distance', 'Speed', 'Throttle', 'Brake']].copy()
         
         return tel_df.to_dict(orient='records')
+
+    @staticmethod
+    def _downsample_indices(length: int, max_points: int = 2000) -> np.ndarray:
+        if length <= max_points:
+            return np.arange(length, dtype=int)
+        step = int(np.ceil(length / max_points))
+        return np.arange(0, length, step, dtype=int)
+
+    @staticmethod
+    def _series_to_json_list(arr) -> List:
+        out = []
+        for x in np.asarray(arr).flatten():
+            if pd.isna(x):
+                out.append(None)
+            elif isinstance(x, (np.bool_, bool)):
+                out.append(float(bool(x)))
+            else:
+                out.append(float(x))
+        return out
+
+    @staticmethod
+    def _pick_lap(laps_driver, lap_number: int):
+        """Return a Lap object for driver + lap number."""
+        ln = int(lap_number)
+        if hasattr(laps_driver, "pick_lap"):
+            try:
+                return laps_driver.pick_lap(ln)
+            except Exception:
+                pass
+        try:
+            filtered = laps_driver[laps_driver["LapNumber"] == ln]
+        except Exception:
+            filtered = laps_driver[laps_driver.LapNumber == ln]  # type: ignore[index]
+        if filtered.shape[0] == 0:
+            raise ValueError(f"No lap {ln} for this driver")
+        return filtered.iloc[0]
+
+    def _extract_single_lap_series(self, session, driver: str, lap_number: int) -> Dict:
+        laps_driver = session.laps.pick_driver(driver)
+        lap = self._pick_lap(laps_driver, lap_number)
+        telemetry = lap.get_telemetry()
+        if telemetry is None or telemetry.empty:
+            raise ValueError(f"No telemetry samples for {driver} lap {lap_number}")
+
+        df = telemetry.copy()
+
+        if "Time" in df.columns:
+            t0 = df["Time"].iloc[0]
+            time_rel = (df["Time"] - t0).dt.total_seconds().values.astype(float)
+        elif "SessionTime" in df.columns:
+            t0 = df["SessionTime"].iloc[0]
+            time_rel = (df["SessionTime"] - t0).dt.total_seconds().values.astype(float)
+        else:
+            time_rel = np.linspace(0.0, 1.0, len(df))
+
+        dist = df["Distance"].astype(float).values
+
+        speed = df["Speed"].astype(float).values if "Speed" in df else np.zeros(len(df))
+        throttle = df["Throttle"].astype(float).values if "Throttle" in df else np.zeros(len(df))
+
+        if "Brake" in df.columns:
+            br = df["Brake"].values
+            brake = np.asarray(br, dtype=float)
+        else:
+            brake = np.zeros(len(df))
+
+        if "RPM" in df.columns:
+            rpm = df["RPM"].astype(float).values
+        elif "rpm" in df.columns:
+            rpm = df["rpm"].astype(float).values
+        else:
+            rpm = np.zeros(len(df))
+
+        if "nGear" in df.columns:
+            gear = df["nGear"].astype(float).values
+        elif "Gear" in df.columns:
+            gear = df["Gear"].astype(float).values
+        else:
+            gear = np.zeros(len(df))
+
+        x = df["X"].astype(float).values if "X" in df.columns else np.zeros(len(df))
+        y = df["Y"].astype(float).values if "Y" in df.columns else np.zeros(len(df))
+
+        lap_time_s = None
+        try:
+            lt = lap["LapTime"] if hasattr(lap, "__getitem__") else getattr(lap, "LapTime", None)
+            if lt is not None and not pd.isna(lt):
+                lap_time_s = float(lt.total_seconds()) if hasattr(lt, "total_seconds") else float(lt)
+        except Exception:
+            lap_time_s = None
+
+        idx = self._downsample_indices(len(dist), max_points=2200)
+        series = {
+            "distance": self._series_to_json_list(dist[idx]),
+            "time_rel_s": self._series_to_json_list(time_rel[idx]),
+            "speed": self._series_to_json_list(speed[idx]),
+            "throttle": self._series_to_json_list(throttle[idx]),
+            "brake": self._series_to_json_list(brake[idx]),
+            "rpm": self._series_to_json_list(rpm[idx]),
+            "gear": self._series_to_json_list(gear[idx]),
+            "x": self._series_to_json_list(x[idx]),
+            "y": self._series_to_json_list(y[idx]),
+        }
+
+        return {
+            "driver": str(driver),
+            "lap": int(lap_number),
+            "lap_time_s": lap_time_s,
+            "series": series,
+        }
+
+    @staticmethod
+    def _compute_delta_series(series_a: Dict, series_b: Dict) -> Dict:
+        d1 = np.array(series_a["distance"], dtype=float)
+        t1 = np.array(series_a["time_rel_s"], dtype=float)
+        d2 = np.array(series_b["distance"], dtype=float)
+        t2 = np.array(series_b["time_rel_s"], dtype=float)
+        if len(d1) < 2 or len(d2) < 2:
+            return {"distance": [], "delta_s": []}
+        d_min = max(float(d1[0]), float(d2[0]))
+        d_max = min(float(d1[-1]), float(d2[-1]))
+        if d_max <= d_min:
+            return {"distance": [], "delta_s": []}
+        n = min(1600, len(d1) + len(d2))
+        grid = np.linspace(d_min, d_max, n)
+        t1_i = np.interp(grid, d1, t1)
+        t2_i = np.interp(grid, d2, t2)
+        return {
+            "distance": grid.tolist(),
+            "delta_s": (t2_i - t1_i).tolist(),
+        }
+
+    def compare_lap_telemetry(
+        self,
+        year: int,
+        gp: str,
+        lap_specs: List[Tuple[str, int]],
+        colors: Optional[List[str]] = None,
+    ) -> Dict:
+        """
+        Full per-lap telemetry for 1–2 laps (distance-aligned), plus delta when two laps are provided.
+        lap_specs: list of (driver_code, lap_number)
+        """
+        session = self._get_session(year, gp)
+
+        default_colors = ["#00D7B6", "#F47600"]
+        palette = (colors or default_colors) + default_colors
+
+        laps_out = []
+        for i, (driver, lap_no) in enumerate(lap_specs):
+            one = self._extract_single_lap_series(session, driver, lap_no)
+            one["color"] = palette[i]
+            laps_out.append(one)
+
+        circuit_length_m = None
+        if laps_out:
+            circuit_length_m = max(max(l["series"]["distance"]) for l in laps_out)
+
+        delta_payload = None
+        if len(laps_out) == 2:
+            delta_payload = self._compute_delta_series(laps_out[0]["series"], laps_out[1]["series"])
+
+        corners_payload: List[Dict] = []
+        try:
+            cinfo = session.get_circuit_info()
+            if cinfo is not None and hasattr(cinfo, "corners") and cinfo.corners is not None:
+                cdf = cinfo.corners
+                for _, row in cdf.iterrows():
+                    num = row.get("Number", row.get("number", None))
+                    dist_m = row.get("Distance", None)
+                    corners_payload.append(
+                        {
+                            "number": int(num) if num is not None and not pd.isna(num) else None,
+                            "distance_m": float(dist_m) if dist_m is not None and not pd.isna(dist_m) else None,
+                        }
+                    )
+        except Exception:
+            corners_payload = []
+
+        event_name = gp
+        try:
+            if hasattr(session, "event") and session.event is not None:
+                event_name = str(session.event.get("EventName", gp))
+        except Exception:
+            event_name = gp
+
+        return {
+            "year": year,
+            "gp": gp,
+            "event_name": event_name,
+            "circuit_length_m": circuit_length_m,
+            "corners": corners_payload,
+            "laps": laps_out,
+            "delta": delta_payload,
+        }
 
 # --- Local Testing Block ---
 if __name__ == "__main__":

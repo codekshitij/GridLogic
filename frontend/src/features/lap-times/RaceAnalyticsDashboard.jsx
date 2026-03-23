@@ -12,20 +12,11 @@ import {
   Bar,
 } from "recharts";
 
-const sectionStyle = {
-  background: "#0a0a0a",
-  border: "1px solid rgba(255,255,255,0.06)",
-  borderRadius: "1rem",
-  padding: "1rem",
-};
+const sectionClass =
+  "rounded-xl border border-border/80 bg-card/90 p-4 ring-1 ring-foreground/10";
 
-const tinyLabel = {
-  fontSize: "0.65rem",
-  textTransform: "uppercase",
-  letterSpacing: "0.1em",
-  color: "#777",
-  fontWeight: 800,
-};
+const labelClass =
+  "text-[0.65rem] font-extrabold uppercase tracking-widest text-muted-foreground";
 
 const tableStyle = {
   width: "100%",
@@ -138,7 +129,7 @@ const RaceAnalyticsDashboard = ({
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
       {visible.has("lap-times") && (
-        <section style={sectionStyle}>
+        <section className={sectionClass}>
           <div
             style={{
               display: "grid",
@@ -147,7 +138,7 @@ const RaceAnalyticsDashboard = ({
             }}
           >
             <div>
-              <div style={tinyLabel}>Lap Times And Splits</div>
+              <div className={labelClass}>Lap Times And Splits</div>
               <div style={{ height: 280, marginTop: "0.5rem" }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={lapSeries}>
@@ -184,7 +175,7 @@ const RaceAnalyticsDashboard = ({
                   padding: "0.75rem",
                 }}
               >
-                <div style={tinyLabel}>Fastest Lap</div>
+                <div className={labelClass}>Fastest Lap</div>
                 <div
                   style={{
                     fontSize: "1.5rem",
@@ -207,7 +198,7 @@ const RaceAnalyticsDashboard = ({
                   padding: "0.75rem",
                 }}
               >
-                <div style={tinyLabel}>Lap Records Preview</div>
+                <div className={labelClass}>Lap Records Preview</div>
                 <div
                   style={{
                     maxHeight: 140,
@@ -238,8 +229,8 @@ const RaceAnalyticsDashboard = ({
       )}
 
       {visible.has("gaps") && (
-        <section style={sectionStyle}>
-          <div style={tinyLabel}>Gaps And Intervals</div>
+        <section className={sectionClass}>
+          <div className={labelClass}>Gaps And Intervals</div>
           <div style={{ height: 260, marginTop: "0.5rem" }}>
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={gapSeries}>
@@ -264,7 +255,7 @@ const RaceAnalyticsDashboard = ({
       )}
 
       {visible.has("strategy") && (
-        <section style={sectionStyle}>
+        <section className={sectionClass}>
           <div
             style={{
               display: "grid",
@@ -273,7 +264,7 @@ const RaceAnalyticsDashboard = ({
             }}
           >
             <div>
-              <div style={tinyLabel}>Tire Usage And Strategy</div>
+              <div className={labelClass}>Tire Usage And Strategy</div>
               <div style={{ height: 240, marginTop: "0.5rem" }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={compoundPace}>
@@ -287,7 +278,7 @@ const RaceAnalyticsDashboard = ({
               </div>
             </div>
             <div>
-              <div style={tinyLabel}>Undercut And Overcut</div>
+              <div className={labelClass}>Undercut And Overcut</div>
               <div
                 style={{
                   maxHeight: 220,
@@ -350,7 +341,7 @@ const RaceAnalyticsDashboard = ({
       )}
 
       {visible.has("pit-fuel") && (
-        <section style={sectionStyle}>
+        <section className={sectionClass}>
           <div
             style={{
               display: "grid",
@@ -359,7 +350,7 @@ const RaceAnalyticsDashboard = ({
             }}
           >
             <div>
-              <div style={tinyLabel}>Fuel Consumption (Proxy Model)</div>
+              <div className={labelClass}>Fuel Consumption (Proxy Model)</div>
               <div
                 style={{
                   fontSize: "0.8rem",
@@ -393,7 +384,7 @@ const RaceAnalyticsDashboard = ({
               </div>
             </div>
             <div>
-              <div style={tinyLabel}>Pit Stop Analysis</div>
+              <div className={labelClass}>Pit Stop Analysis</div>
               <div
                 style={{
                   maxHeight: 160,
@@ -428,7 +419,7 @@ const RaceAnalyticsDashboard = ({
             }}
           >
             <div style={{ maxHeight: 170, overflow: "auto" }}>
-              <div style={tinyLabel}>Team Crew Performance</div>
+              <div className={labelClass}>Team Crew Performance</div>
               {(pitTeamPerf || []).map((team) => (
                 <div
                   key={team.team}
@@ -447,7 +438,7 @@ const RaceAnalyticsDashboard = ({
             </div>
 
             <div style={{ maxHeight: 170, overflow: "auto" }}>
-              <div style={tinyLabel}>Pit Event Stream</div>
+              <div className={labelClass}>Pit Event Stream</div>
               {(pitRows || []).slice(0, 30).map((event, idx) => (
                 <div
                   key={`pit-event-${idx}`}
@@ -467,7 +458,7 @@ const RaceAnalyticsDashboard = ({
       )}
 
       {visible.has("comparisons") && (
-        <section style={sectionStyle}>
+        <section className={sectionClass}>
           <div
             style={{
               display: "flex",
@@ -475,7 +466,7 @@ const RaceAnalyticsDashboard = ({
               alignItems: "center",
             }}
           >
-            <div style={tinyLabel}>Driver Comparisons</div>
+            <div className={labelClass}>Driver Comparisons</div>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
@@ -525,7 +516,7 @@ const RaceAnalyticsDashboard = ({
           </div>
 
           <div style={{ marginTop: "0.6rem" }}>
-            <div style={tinyLabel}>Teammate Head-to-head</div>
+            <div className={labelClass}>Teammate Head-to-head</div>
             <div
               style={{
                 display: "grid",
@@ -559,7 +550,7 @@ const RaceAnalyticsDashboard = ({
       )}
 
       {visible.has("weather") && (
-        <section style={sectionStyle}>
+        <section className={sectionClass}>
           <div
             style={{
               display: "grid",
@@ -568,7 +559,7 @@ const RaceAnalyticsDashboard = ({
             }}
           >
             <div>
-              <div style={tinyLabel}>Weather And Track Conditions</div>
+              <div className={labelClass}>Weather And Track Conditions</div>
               <div style={{ height: 220, marginTop: "0.45rem" }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={weatherImpact}>
@@ -600,7 +591,7 @@ const RaceAnalyticsDashboard = ({
             </div>
 
             <div>
-              <div style={tinyLabel}>Session-by-session</div>
+              <div className={labelClass}>Session-by-session</div>
               <div
                 style={{
                   maxHeight: 220,
@@ -655,7 +646,7 @@ const RaceAnalyticsDashboard = ({
       )}
 
       {(visible.has("race-control") || visible.has("setup")) && (
-        <section style={sectionStyle}>
+        <section className={sectionClass}>
           <div
             style={{
               display: "grid",
@@ -665,7 +656,7 @@ const RaceAnalyticsDashboard = ({
           >
             {visible.has("race-control") ? (
               <div>
-                <div style={tinyLabel}>Race Replay And Visualization</div>
+                <div className={labelClass}>Race Replay And Visualization</div>
                 <div
                   style={{
                     fontSize: "0.8rem",
@@ -704,7 +695,9 @@ const RaceAnalyticsDashboard = ({
 
             {visible.has("setup") ? (
               <div>
-                <div style={tinyLabel}>Setup And Configuration Insights</div>
+                <div className={labelClass}>
+                  Setup And Configuration Insights
+                </div>
                 <div
                   style={{
                     fontSize: "0.8rem",

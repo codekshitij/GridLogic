@@ -26,8 +26,8 @@ const CalendarRaceDetail = ({
   const status = getRaceStatus(event);
 
   return (
-    <section className="w-full lg:w-[62%] xl:w-[66%] p-6 md:p-8 bg-[#13131b] border border-white/5 flex flex-col gap-6">
-      <div className="relative min-h-[320px] rounded-md overflow-hidden border-l-4 border-[#ff553d] bg-[#171721]">
+    <section className="flex w-full flex-col gap-6 border-border/40 bg-background/40 p-6 md:p-8 lg:w-[62%] xl:w-[66%]">
+      <div className="relative min-h-[320px] overflow-hidden rounded-lg border-l-4 border-racing bg-card">
         {imageUrl ? (
           <img
             src={imageUrl}
@@ -35,55 +35,55 @@ const CalendarRaceDetail = ({
             className="absolute inset-0 h-full w-full object-cover opacity-55"
           />
         ) : (
-          <div className="absolute inset-0 bg-gradient-to-br from-[#1f1f28] via-[#171721] to-[#0f0f17]" />
+          <div className="absolute inset-0 bg-gradient-to-br from-muted via-card to-background" />
         )}
 
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0d0d16] via-[#0d0d16]/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
 
         <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
           <div className="flex items-center gap-3 mb-3">
-            <span className="bg-[#ff553d] px-3 py-1 text-[10px] uppercase tracking-widest font-black text-white">
+            <span className="bg-racing px-3 py-1 text-[10px] font-black uppercase tracking-widest text-white">
               {status === "active"
                 ? "Active Event"
                 : status === "completed"
                   ? "Completed"
                   : "Upcoming"}
             </span>
-            <span className="text-[10px] uppercase tracking-[0.2em] text-white/50 font-bold">
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
               Round {String(event?.RoundNumber || "--").padStart(2, "0")}
             </span>
           </div>
 
-          <h2 className="text-3xl md:text-5xl font-black italic tracking-tight uppercase text-white">
+          <h2 className="font-headline text-3xl font-black uppercase italic tracking-tight text-foreground md:text-5xl">
             {event?.EventName || "Select a race"}
           </h2>
-          <p className="mt-2 text-sm md:text-base text-white/75">
+          <p className="mt-2 text-sm text-muted-foreground md:text-base">
             {event?.Location || "Unknown"}, {event?.Country || "Unknown"} •{" "}
             {formatEventWindow(event)}
           </p>
 
           <div className="mt-6 grid grid-cols-3 gap-3 max-w-md">
-            <div className="bg-[#13131b]/80 border-b-2 border-[#ff553d] p-3">
-              <p className="text-[10px] tracking-widest text-white/40 font-bold uppercase">
+            <div className="border-b-2 border-racing bg-muted/40 p-3 backdrop-blur-sm">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
                 Days
               </p>
-              <p className="text-2xl font-black font-headline text-white">
+              <p className="font-headline text-2xl font-black text-foreground">
                 {countdown.days}
               </p>
             </div>
-            <div className="bg-[#13131b]/80 border-b-2 border-[#ff553d] p-3">
-              <p className="text-[10px] tracking-widest text-white/40 font-bold uppercase">
+            <div className="border-b-2 border-racing bg-muted/40 p-3 backdrop-blur-sm">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
                 Hours
               </p>
-              <p className="text-2xl font-black font-headline text-white">
+              <p className="font-headline text-2xl font-black text-foreground">
                 {countdown.hours}
               </p>
             </div>
-            <div className="bg-[#13131b]/80 border-b-2 border-[#ff553d] p-3">
-              <p className="text-[10px] tracking-widest text-white/40 font-bold uppercase">
+            <div className="border-b-2 border-racing bg-muted/40 p-3 backdrop-blur-sm">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
                 Mins
               </p>
-              <p className="text-2xl font-black font-headline text-white">
+              <p className="font-headline text-2xl font-black text-foreground">
                 {countdown.mins}
               </p>
             </div>
@@ -100,12 +100,12 @@ const CalendarRaceDetail = ({
         {detailItems.map((item) => (
           <div
             key={item.key}
-            className="bg-[#1b1b24] border-l-2 border-white/10 p-5"
+            className="border-l-2 border-border bg-card p-5 ring-1 ring-foreground/5"
           >
-            <p className="text-[10px] uppercase tracking-[0.22em] text-[#ffb4a7] font-bold">
+            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-primary">
               {item.key}
             </p>
-            <p className="mt-2 text-lg font-black text-white break-words">
+            <p className="mt-2 break-words text-lg font-black text-foreground">
               {item.accessor(event)}
             </p>
           </div>

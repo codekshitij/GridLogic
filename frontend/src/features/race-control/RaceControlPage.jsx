@@ -1,19 +1,27 @@
 import React from "react";
 import { useRaceAnalytics } from "../../hooks/useRaceData";
 import RaceAnalyticsDashboard from "../lap-times/RaceAnalyticsDashboard";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const RaceControlPage = ({ year, gp }) => {
   const analytics = useRaceAnalytics(year, gp);
 
   if (analytics.isLoading) {
-    return <div style={styles.loading}>LOADING_RACE_CONTROL...</div>;
+    return (
+      <div className="flex flex-col gap-4 py-4">
+        <Skeleton className="h-10 w-full max-w-md rounded-lg" />
+        <Skeleton className="h-96 w-full rounded-xl" />
+      </div>
+    );
   }
 
   if (analytics.error) {
     return (
-      <div style={styles.error}>
-        RACE_CONTROL_ERROR: {analytics.error.message}
-      </div>
+      <Alert variant="destructive" className="max-w-xl">
+        <AlertTitle>Race control error</AlertTitle>
+        <AlertDescription>{analytics.error.message}</AlertDescription>
+      </Alert>
     );
   }
 
@@ -25,25 +33,6 @@ const RaceControlPage = ({ year, gp }) => {
       visibleSections={["race-control"]}
     />
   );
-};
-
-const styles = {
-  loading: {
-    padding: "5rem",
-    textAlign: "center",
-    color: "#ff1801",
-    fontWeight: "900",
-    letterSpacing: "0.3em",
-    textTransform: "uppercase",
-  },
-  error: {
-    padding: "2rem",
-    color: "#ef4444",
-    background: "rgba(239, 68, 68, 0.1)",
-    borderRadius: "1rem",
-    textAlign: "center",
-    fontWeight: "bold",
-  },
 };
 
 export default RaceControlPage;

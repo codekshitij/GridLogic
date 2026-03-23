@@ -6,6 +6,8 @@ import GapChart from "./GapChart";
 import FastestLapCard from "../../components/FastestLapCard";
 import RaceWinnerCard from "../../components/RaceWinnerCard";
 import { useWorkerizedData } from "./useWorkerizedData";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const LapTimeController = ({
   year,
@@ -19,7 +21,6 @@ const LapTimeController = ({
   const allDrivers = useMemo(() => meta.data?.drivers || [], [meta.data]);
   const driversToShow = selectedDrivers;
 
-  // Use web worker for gap data transformation
   const gapSeries =
     useWorkerizedData(
       new URL("./gap.worker.js", import.meta.url),
@@ -30,7 +31,6 @@ const LapTimeController = ({
       [analytics.data, driversToShow],
     ) || [];
 
-  // Use web worker for pace chart data transformation (per-lap mode)
   const paceChartData =
     useWorkerizedData(
       new URL("./pace.worker.js", import.meta.url),
@@ -41,24 +41,40 @@ const LapTimeController = ({
       },
       [analytics.data, driversToShow],
     )?.chartData || [];
-  // Fastest lap info
+
   const globalFastest = analytics.data?.lap_times_and_splits?.global_fastest;
   const raceWinner = meta.data?.race_winner;
 
   if (meta.isLoading || analytics.isLoading) {
-    return <div style={styles.loading}>SYNCING_RACE_METRICS...</div>;
+    return (
+      <div className="flex flex-col gap-4 py-8">
+        <Skeleton className="h-32 w-full rounded-xl" />
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Skeleton className="h-40 rounded-xl" />
+          <Skeleton className="h-40 rounded-xl" />
+        </div>
+        <Skeleton className="h-72 w-full rounded-xl" />
+        <Skeleton className="h-72 w-full rounded-xl" />
+      </div>
+    );
   }
   if (meta.error)
     return (
-      <div style={styles.error}>CONNECTION_LOST: {meta.error.message}</div>
+      <Alert variant="destructive" className="max-w-xl">
+        <AlertTitle>Connection lost</AlertTitle>
+        <AlertDescription>{meta.error.message}</AlertDescription>
+      </Alert>
     );
   if (analytics.error)
     return (
-      <div style={styles.error}>ANALYTICS_ERROR: {analytics.error.message}</div>
+      <Alert variant="destructive" className="max-w-xl">
+        <AlertTitle>Analytics error</AlertTitle>
+        <AlertDescription>{analytics.error.message}</AlertDescription>
+      </Alert>
     );
 
   return (
-    <div style={styles.container}>
+    <div className="flex flex-col gap-8">
       <DriverPanel
         allDrivers={allDrivers}
         selectedDrivers={selectedDrivers}
@@ -66,9 +82,8 @@ const LapTimeController = ({
         onClear={() => onSelectionChange([])}
       />
 
-      {/* Summary Cards */}
       {(globalFastest || raceWinner) && (
-        <div style={styles.summaryCards}>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-[repeat(auto-fit,minmax(280px,1fr))]">
           {globalFastest && (
             <FastestLapCard
               driver={globalFastest.driver}
@@ -87,53 +102,12 @@ const LapTimeController = ({
         </div>
       )}
 
-      {/* Pace Chart */}
-      <div style={{ marginBottom: "2rem" }}>
+      <div className="space-y-8">
         <PaceChart data={paceChartData} selectedDrivers={driversToShow} />
-      </div>
-
-      {/* Gap Chart */}
-      <div style={{ marginBottom: "2rem" }}>
         <GapChart data={gapSeries} selectedDrivers={driversToShow} />
       </div>
     </div>
   );
-};
-
-const styles = {
-  container: { display: "flex", flexDirection: "column", gap: "2rem" },
-  summaryCards: {
-    marginBottom: "1.5rem",
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(280px, 320px))",
-    gap: "1rem",
-  },
-  loading: {
-    padding: "5rem",
-    textAlign: "center",
-    color: "#ff1801",
-    fontWeight: "900",
-    letterSpacing: "0.5em",
-    textTransform: "uppercase",
-  },
-  error: {
-    padding: "2rem",
-    color: "#ef4444",
-    background: "rgba(239, 68, 68, 0.1)",
-    borderRadius: "1rem",
-    textAlign: "center",
-    fontWeight: "bold",
-  },
-  emptyState: {
-    padding: "10rem",
-    textAlign: "center",
-    color: "#333",
-    fontWeight: "900",
-    border: "1px solid #111",
-    borderRadius: "2rem",
-    letterSpacing: "0.1em",
-    textTransform: "uppercase",
-  },
 };
 
 export default LapTimeController;

@@ -2,4 +2,5 @@ fastapi
 uvicorn
 fastf1
 pandas
+numpy
 pydantic

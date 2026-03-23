@@ -1,160 +1,27 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
+import { CalendarDays, Flag } from "lucide-react";
+import { cn } from "@/lib/utils";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
 
 const navLinks = [
   { to: "/lap-times", label: "Live Timing" },
+  { to: "/telemetry", label: "Telemetry" },
   { to: "/calender", label: "Calendar" },
   { to: "/strategy", label: "Drivers" },
   { to: "/technical", label: "Teams" },
 ];
 
 const years = [2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026];
-
-const styles = {
-  header: {
-    position: "fixed",
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 50,
-    background: "rgba(10,10,15,0.40)",
-    backdropFilter: "blur(16px)",
-    borderBottom: "1px solid rgba(255,255,255,0.05)",
-    width: "100%",
-  },
-  container: {
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    width: "100%",
-    padding: "20px 40px",
-    boxSizing: "border-box",
-  },
-  brandNav: {
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    gap: "4rem",
-    minWidth: 0,
-  },
-  brand: {
-    fontSize: "2.2rem",
-    fontWeight: 900,
-    letterSpacing: "-0.04em",
-    color: "#fff",
-    fontStyle: "italic",
-    cursor: "pointer",
-    transition: "color 0.2s",
-    userSelect: "none",
-    lineHeight: 1,
-    display: "flex",
-    alignItems: "center",
-  },
-  brandDot: {
-    color: "#e10600",
-    marginLeft: 2,
-    fontWeight: 900,
-    fontSize: "1.5rem",
-  },
-  nav: {
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    gap: "2rem",
-  },
-  navLink: (isActive) => ({
-    position: "relative",
-    fontFamily: "sans-serif",
-    textTransform: "uppercase",
-    letterSpacing: "0.18em",
-    fontSize: "1rem",
-    fontWeight: 700,
-    padding: "0.5rem 0",
-    color: isActive ? "#e10600" : "rgba(255,255,255,0.5)",
-    transition: "color 0.2s, font-size 0.2s",
-    background: "none",
-    border: "none",
-    outline: "none",
-    cursor: "pointer",
-    marginRight: "0.5rem",
-    textDecoration: "none",
-  }),
-  navUnderline: (isActive) => ({
-    position: "absolute",
-    left: 0,
-    bottom: -2,
-    height: 2,
-    background: "#e10600",
-    boxShadow: "0 0 12px #e10600",
-    width: isActive ? "100%" : 0,
-    opacity: isActive ? 1 : 0,
-    transition: "width 0.3s, opacity 0.3s",
-  }),
-  controls: {
-    display: "flex",
-    alignItems: "center",
-    gap: "1.2rem",
-    background: "rgba(30,30,40,0.55)",
-    boxShadow: "0 2px 16px 0 rgba(0,0,0,0.18)",
-    padding: "0.5rem 1.2rem",
-    borderRadius: "1.5rem",
-    border: "1.5px solid rgba(255,255,255,0.13)",
-    backdropFilter: "blur(8px)",
-    minWidth: 220,
-    marginLeft: 16,
-  },
-  controlGroup: {
-    display: "flex",
-    alignItems: "center",
-    gap: "0.7rem",
-    padding: "0 1.1rem 0 0",
-    borderRight: "1.5px solid rgba(255,255,255,0.10)",
-    height: 36,
-  },
-  controlGroupLast: {
-    display: "flex",
-    alignItems: "center",
-    gap: "0.7rem",
-    padding: "0 0 0 1.1rem",
-    height: 36,
-  },
-  controlLabel: {
-    fontSize: "0.7rem",
-    color: "#e10600",
-    textTransform: "uppercase",
-    fontWeight: 900,
-    letterSpacing: "0.13em",
-    marginRight: 2,
-    opacity: 0.85,
-    textShadow: "0 1px 4px #000a",
-  },
-  select: {
-    background: "rgba(19,19,27,0.95)",
-    color: "#fff",
-    fontWeight: 700,
-    fontSize: "0.97rem",
-    outline: "none",
-    border: "1.5px solid #23232e",
-    borderRadius: "0.7rem",
-    cursor: "pointer",
-    appearance: "none",
-    maxWidth: 140,
-    minWidth: 70,
-    textOverflow: "ellipsis",
-    padding: "0.35rem 0.7rem",
-    boxShadow: "0 1px 6px 0 #0004",
-    marginLeft: 2,
-    marginRight: 2,
-    transition: "border 0.2s, box-shadow 0.2s",
-  },
-  option: {
-    background: "#13131b",
-    color: "#fff",
-    fontWeight: 700,
-    fontSize: "0.97rem",
-  },
-};
 
 const TopNavbar = ({
   selectedYear,
@@ -164,59 +31,169 @@ const TopNavbar = ({
   availableGPs = [],
 }) => {
   return (
-    <header style={styles.header}>
-      <div style={styles.container}>
-        {/* Brand + Nav */}
-        <div style={styles.brandNav}>
-          <span style={styles.brand}>
-            KIDŌ<span style={styles.brandDot}>.</span>
+    <header className="fixed inset-x-0 top-0 z-50 border-b border-border/80 bg-background/75 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
+      <div className="mx-auto flex max-w-[1800px] flex-wrap items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-10">
+        <div className="flex min-w-0 flex-1 flex-col gap-4 sm:flex-row sm:items-center sm:gap-10 lg:gap-14">
+          <span className="shrink-0 cursor-default select-none font-headline text-2xl font-black italic tracking-tight text-foreground sm:text-[1.65rem]">
+            KIDŌ<span className="text-racing">.</span>
           </span>
-          <nav style={styles.nav}>
+          <nav className="flex flex-wrap items-center gap-1 sm:gap-6 lg:gap-8">
             {navLinks.map((item) => (
               <NavLink
                 key={item.to}
                 to={item.to}
-                style={({ isActive }) => styles.navLink(isActive)}
+                className={({ isActive }) =>
+                  cn(
+                    "relative py-1.5 text-[0.65rem] font-bold uppercase tracking-[0.18em] transition-colors sm:text-xs",
+                    isActive
+                      ? "text-racing"
+                      : "text-muted-foreground hover:text-foreground",
+                  )
+                }
               >
                 {({ isActive }) => (
                   <>
                     {item.label}
-                    <span style={styles.navUnderline(isActive)} />
+                    <span
+                      className={cn(
+                        "absolute bottom-0 left-0 h-0.5 rounded-full bg-racing shadow-[0_0_12px_rgba(225,6,0,0.6)] transition-all duration-300",
+                        isActive ? "w-full opacity-100" : "w-0 opacity-0",
+                      )}
+                    />
                   </>
                 )}
               </NavLink>
             ))}
           </nav>
         </div>
-        {/* Dynamic Controls */}
-        <div style={styles.controls}>
-          <div style={styles.controlGroup}>
-            <span style={styles.controlLabel}>Year</span>
-            <select
-              value={selectedYear ?? ""}
-              onChange={(e) => onYearChange(Number(e.target.value))}
-              style={styles.select}
+
+        <div className="flex w-full flex-col gap-3 rounded-2xl border border-border/70 bg-gradient-to-b from-muted/40 to-muted/20 p-3 shadow-sm ring-1 ring-foreground/[0.06] sm:w-auto sm:min-w-[320px] sm:flex-row sm:items-stretch sm:gap-0 sm:p-2 lg:min-w-[400px]">
+          {/* Season */}
+          <div className="flex min-w-0 flex-1 flex-col gap-1.5 sm:px-3 sm:py-1.5">
+            <span className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">
+              <CalendarDays className="size-3 text-racing/90" aria-hidden />
+              Season
+            </span>
+            <Select
+              value={selectedYear != null ? String(selectedYear) : ""}
+              onValueChange={(v) => onYearChange(Number(v))}
             >
-              {years.map((y) => (
-                <option key={y} value={y} style={styles.option}>
-                  {y}
-                </option>
-              ))}
-            </select>
+              <SelectTrigger
+                size="default"
+                aria-label="Select season year"
+                className={cn(
+                  "h-10 w-full min-w-[6.5rem] justify-between gap-2 rounded-xl border-border/70 bg-background/95 px-3 shadow-inner",
+                  "font-semibold tabular-nums tracking-tight",
+                  "hover:border-racing/35 hover:bg-accent/30",
+                  "focus-visible:border-racing/50 focus-visible:ring-racing/20",
+                  "data-[state=open]:border-racing/40 data-[state=open]:shadow-md",
+                )}
+              >
+                <span className="flex min-w-0 flex-1 items-center gap-2">
+                  <CalendarDays
+                    className="size-3.5 shrink-0 text-racing opacity-90"
+                    aria-hidden
+                  />
+                  <SelectValue placeholder="Year" />
+                </span>
+              </SelectTrigger>
+              <SelectContent
+                position="popper"
+                sideOffset={8}
+                align="start"
+                className="z-[200] max-h-72 w-[var(--radix-select-trigger-width)] min-w-[var(--radix-select-trigger-width)] rounded-xl border-border/80 p-1 shadow-xl ring-1 ring-foreground/10"
+              >
+                <SelectGroup>
+                  <SelectLabel className="px-3 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">
+                    Championship years
+                  </SelectLabel>
+                  <div className="max-h-60 overflow-y-auto py-0.5">
+                    {years.map((y) => (
+                      <SelectItem
+                        key={y}
+                        value={String(y)}
+                        className="cursor-pointer rounded-lg py-2.5 pl-3 pr-8 text-[15px] font-semibold tabular-nums focus:bg-racing/15 focus:text-foreground"
+                      >
+                        {y}
+                      </SelectItem>
+                    ))}
+                  </div>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
           </div>
-          <div style={styles.controlGroupLast}>
-            <span style={styles.controlLabel}>GP</span>
-            <select
+
+          <Separator
+            orientation="vertical"
+            className="hidden bg-border/60 sm:my-2 sm:block sm:h-auto sm:w-px sm:self-stretch"
+          />
+
+          {/* Grand Prix */}
+          <div className="flex min-w-0 flex-[1.4] flex-col gap-1.5 sm:px-3 sm:py-1.5">
+            <span className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">
+              <Flag className="size-3 text-racing/90" aria-hidden />
+              Grand Prix
+            </span>
+            <Select
               value={selectedGP ?? ""}
-              onChange={(e) => onGPChange(e.target.value)}
-              style={styles.select}
+              onValueChange={(v) => onGPChange(v)}
+              disabled={!availableGPs.length}
             >
-              {availableGPs.map((gp) => (
-                <option key={gp} value={gp} style={styles.option}>
-                  {gp}
-                </option>
-              ))}
-            </select>
+              <SelectTrigger
+                size="default"
+                aria-label="Select Grand Prix"
+                className={cn(
+                  "h-auto min-h-10 w-full min-w-0 justify-between gap-2 rounded-xl border-border/70 bg-background/95 py-2 pl-3 pr-2 text-left shadow-inner",
+                  "font-medium leading-snug",
+                  "hover:border-racing/35 hover:bg-accent/30",
+                  "focus-visible:border-racing/50 focus-visible:ring-racing/20",
+                  "data-[state=open]:border-racing/40 data-[state=open]:shadow-md",
+                  "disabled:opacity-60",
+                )}
+              >
+                <span className="flex min-w-0 flex-1 items-start gap-2 text-left">
+                  <Flag
+                    className="mt-0.5 size-3.5 shrink-0 text-racing opacity-90"
+                    aria-hidden
+                  />
+                  <SelectValue
+                    placeholder={
+                      availableGPs.length ? "Choose a race…" : "No races"
+                    }
+                    className="line-clamp-2 text-left"
+                  />
+                </span>
+              </SelectTrigger>
+              <SelectContent
+                position="popper"
+                sideOffset={8}
+                align="end"
+                className={cn(
+                  "z-[200] max-h-[min(24rem,calc(100vh-8rem))] rounded-xl border-border/80 p-1 shadow-xl ring-1 ring-foreground/10",
+                  "min-w-[var(--radix-select-trigger-width)] max-w-[min(92vw,26rem)]",
+                  "data-[side=bottom]:slide-in-from-top-1",
+                )}
+              >
+                <SelectGroup>
+                  <SelectLabel className="px-3 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">
+                    {selectedYear != null
+                      ? `${selectedYear} calendar`
+                      : "Races"}
+                  </SelectLabel>
+                  <div className="max-h-[min(20rem,calc(100vh-10rem))] overflow-y-auto overscroll-contain py-0.5">
+                    {availableGPs.map((gp) => (
+                      <SelectItem
+                        key={gp}
+                        value={gp}
+                        className="cursor-pointer rounded-lg py-2.5 pl-3 pr-10 text-left text-sm leading-snug break-words whitespace-normal focus:bg-racing/15 focus:text-foreground"
+                      >
+                        {gp}
+                      </SelectItem>
+                    ))}
+                  </div>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </div>

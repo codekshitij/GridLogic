@@ -1,28 +1,31 @@
 import React from "react";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import CalendarRaceCard from "./CalendarRaceCard";
 
 const CalendarRaceList = ({ events, selectedRaceName, onSelectRace }) => {
   return (
-    <section className="w-full lg:w-[38%] xl:w-[34%] bg-[#101018] border-l border-white/5 flex flex-col">
-      <div className="p-6 pb-4 flex items-end justify-between">
-        <h3 className="text-xl font-black italic uppercase tracking-tight text-white">
-          Season Calendar
+    <section className="flex w-full flex-col border-t border-border/60 bg-muted/20 lg:w-[38%] lg:border-t-0 lg:border-l xl:w-[34%]">
+      <div className="flex items-end justify-between px-6 pb-4 pt-6">
+        <h3 className="font-headline text-xl font-black italic uppercase tracking-tight text-foreground">
+          Season calendar
         </h3>
-        <span className="text-[10px] uppercase tracking-[0.18em] text-white/40 font-bold">
-          Select Race
+        <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+          Select race
         </span>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-6 pb-6 space-y-3">
-        {events.map((event) => (
-          <CalendarRaceCard
-            key={`${event.RoundNumber}-${event.EventName}`}
-            event={event}
-            isActive={selectedRaceName === event.EventName}
-            onClick={() => onSelectRace(event)}
-          />
-        ))}
-      </div>
+      <ScrollArea className="h-[min(70vh,720px)] px-6 pb-6">
+        <div className="space-y-3 pr-3">
+          {events.map((event) => (
+            <CalendarRaceCard
+              key={`${event.RoundNumber}-${event.EventName}`}
+              event={event}
+              isActive={selectedRaceName === event.EventName}
+              onClick={() => onSelectRace(event)}
+            />
+          ))}
+        </div>
+      </ScrollArea>
     </section>
   );
 };
