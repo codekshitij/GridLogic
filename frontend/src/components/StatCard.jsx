@@ -1,28 +1,41 @@
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { cn } from "@/lib/utils";
+
 const StatCard = ({ title, value, unit, trend, icon: Icon }) => (
-  <div className="bg-[#111] border border-white/5 p-4 rounded-2xl hover:border-f1-red/50 transition-all group">
-    <div className="flex justify-between items-start mb-2">
-      <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">
+  <Card className="group border-border/80 bg-card/90 transition-colors hover:border-racing/40 hover:shadow-md">
+    <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
+      <CardDescription className="text-[0.65rem] font-black uppercase tracking-widest">
         {title}
-      </span>
+      </CardDescription>
       {Icon && (
-        <Icon
-          size={16}
-          className="text-gray-600 group-hover:text-f1-red transition-colors"
-        />
+        <Icon className="size-4 text-muted-foreground transition-colors group-hover:text-racing" />
       )}
-    </div>
-    <div className="flex items-baseline gap-1">
-      <span className="text-2xl font-black italic">{value}</span>
-      <span className="text-xs font-bold text-gray-600">{unit}</span>
-    </div>
-    {trend && (
-      <div
-        className={`text-[10px] mt-2 font-bold ${trend > 0 ? "text-green-500" : "text-red-500"}`}
-      >
-        {trend > 0 ? "▲" : "▼"} {Math.abs(trend)}% vs Prev. Lap
-      </div>
-    )}
-  </div>
+    </CardHeader>
+    <CardContent>
+      <CardTitle className="font-headline text-2xl font-black italic tabular-nums">
+        {value}
+        <span className="ml-1 text-xs font-bold not-italic text-muted-foreground">
+          {unit}
+        </span>
+      </CardTitle>
+      {trend != null && (
+        <p
+          className={cn(
+            "mt-2 text-[0.65rem] font-bold",
+            trend > 0 ? "text-emerald-500" : "text-red-500",
+          )}
+        >
+          {trend > 0 ? "▲" : "▼"} {Math.abs(trend)}% vs prev. lap
+        </p>
+      )}
+    </CardContent>
+  </Card>
 );
 
 export default StatCard;
