@@ -14,11 +14,13 @@ import { getDriverColor } from "../../theme/f1Colors";
 const PaceChart = ({ data, selectedDrivers }) => {
   if (!selectedDrivers?.length) {
     return (
-      <div style={styles.container}>
-        <div style={styles.header}>
-          <h3 style={styles.chartTitle}>Lap-by-Lap Pace Chart</h3>
+      <div className="rounded-2xl border border-dashed border-border/80 bg-card/50 p-6 ring-1 ring-foreground/5">
+        <div className="mb-4 flex justify-between">
+          <h3 className="text-[0.65rem] font-black uppercase tracking-[0.2em] text-muted-foreground">
+            Lap-by-lap pace chart
+          </h3>
         </div>
-        <div style={styles.emptyState}>
+        <div className="flex min-h-[180px] items-center justify-center rounded-xl border border-dashed border-border/60 text-sm font-bold text-muted-foreground">
           Select at least one driver to plot pace.
         </div>
       </div>
@@ -62,15 +64,19 @@ const PaceChart = ({ data, selectedDrivers }) => {
   const yDomain = [minLapTime - 1, maxLapTime + 1];
 
   return (
-    <div style={styles.container}>
-      <div style={styles.header}>
-        <h3 style={styles.chartTitle}>Lap-by-Lap Pace Chart</h3>
+    <div className="rounded-2xl border border-border/80 bg-card/90 p-6 shadow-lg ring-1 ring-foreground/10">
+      <div className="mb-6 flex items-center justify-between">
+        <h3 className="text-[0.65rem] font-black uppercase tracking-[0.2em] text-muted-foreground">
+          Lap-by-lap pace chart
+        </h3>
         {selectedDrivers.length > 5 && (
-          <span style={styles.perfBadge}>High Density Mode</span>
+          <span className="rounded border border-border bg-muted px-1.5 py-0.5 text-[0.5rem] font-black text-muted-foreground">
+            High density mode
+          </span>
         )}
       </div>
 
-      <div style={styles.chartWrapper}>
+      <div className="h-[600px] w-full rounded-xl bg-muted/20 p-4 shadow-inner">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart
             data={data}
@@ -191,43 +197,6 @@ const PaceChart = ({ data, selectedDrivers }) => {
 };
 
 const styles = {
-  container: {
-    background: "#0a0a0a",
-    border: "1px solid rgba(255,255,255,0.05)",
-    padding: "1.5rem",
-    borderRadius: "1.5rem",
-    boxShadow: "0 25px 50px -12px rgba(0,0,0,0.5)",
-  },
-  header: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: "1.5rem",
-  },
-  chartTitle: {
-    fontSize: "0.65rem",
-    fontWeight: "900",
-    color: "#555",
-    textTransform: "uppercase",
-    letterSpacing: "0.2em",
-  },
-  perfBadge: {
-    fontSize: "0.5rem",
-    background: "#111",
-    color: "#444",
-    padding: "2px 6px",
-    borderRadius: "4px",
-    fontWeight: "900",
-    border: "1px solid #222",
-  },
-  chartWrapper: {
-    height: "600px", // Increased height for better visibility
-    width: "100%",
-    background: "#181818",
-    borderRadius: "1.2rem",
-    boxShadow: "0 8px 32px 0 rgba(0,0,0,0.25)",
-    padding: "1rem",
-  },
   tooltip: {
     backgroundColor: "#000",
     border: "1px solid #222",
@@ -239,17 +208,6 @@ const styles = {
     fontSize: "11px",
     fontWeight: "900",
     textTransform: "uppercase",
-  },
-  emptyState: {
-    minHeight: "180px",
-    border: "1px dashed #222",
-    borderRadius: "1rem",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    color: "#666",
-    fontSize: "0.85rem",
-    fontWeight: "700",
   },
 };
 
