@@ -13,9 +13,11 @@ import { getDriverColor } from "../../theme/f1Colors";
 const GapChart = ({ data, selectedDrivers }) => {
   if (!selectedDrivers?.length) {
     return (
-      <div style={styles.container}>
-        <h3 style={styles.chartTitle}>Interval Gaps (Seconds)</h3>
-        <div style={styles.emptyState}>
+      <div className="rounded-2xl border border-dashed border-border/80 bg-card/50 p-6 ring-1 ring-foreground/5">
+        <h3 className="mb-6 text-[0.65rem] font-black uppercase tracking-[0.2em] text-muted-foreground">
+          Interval gaps (seconds)
+        </h3>
+        <div className="flex min-h-[180px] items-center justify-center rounded-xl border border-dashed border-border/60 text-sm font-bold text-muted-foreground">
           Select at least one driver to plot gaps.
         </div>
       </div>
@@ -23,11 +25,11 @@ const GapChart = ({ data, selectedDrivers }) => {
   }
 
   return (
-    <div style={styles.container}>
-      <h3 style={styles.chartTitle}>
-        Interval Gaps vs {selectedDrivers[0]} (Seconds)
+    <div className="rounded-2xl border border-border/80 bg-card/90 p-6 shadow-lg ring-1 ring-foreground/10">
+      <h3 className="mb-6 text-[0.65rem] font-black uppercase tracking-[0.2em] text-muted-foreground">
+        Interval gaps vs {selectedDrivers[0]} (seconds)
       </h3>
-      <div style={styles.chartWrapper}>
+      <div className="h-[250px] w-full">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart
             data={data}
@@ -99,25 +101,6 @@ const GapChart = ({ data, selectedDrivers }) => {
 };
 
 const styles = {
-  container: {
-    background: "#0a0a0a",
-    border: "1px solid rgba(255,255,255,0.05)",
-    padding: "1.5rem",
-    borderRadius: "1.5rem",
-    boxShadow: "0 25px 50px -12px rgba(0,0,0,0.5)",
-  },
-  chartTitle: {
-    fontSize: "0.65rem",
-    fontWeight: "900",
-    color: "#555",
-    textTransform: "uppercase",
-    letterSpacing: "0.2em",
-    marginBottom: "1.5rem",
-  },
-  chartWrapper: {
-    height: "250px",
-    width: "100%",
-  },
   tooltip: {
     backgroundColor: "#000",
     border: "1px solid #222",
@@ -127,17 +110,6 @@ const styles = {
   tooltipItem: {
     fontSize: "12px",
     fontWeight: "900",
-  },
-  emptyState: {
-    minHeight: "180px",
-    border: "1px dashed #222",
-    borderRadius: "1rem",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    color: "#666",
-    fontSize: "0.85rem",
-    fontWeight: "700",
   },
 };
 
