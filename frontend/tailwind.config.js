@@ -16,6 +16,7 @@ export default {
         "on-surface": "#e4e1ee",
         "on-surface-variant": "#eabcb4",
         outline: "#b08780",
+        racing: "#e10600",
       },
       fontFamily: {
         headline: ["Space Grotesk", "sans-serif"],
