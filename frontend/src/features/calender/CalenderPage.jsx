@@ -3,6 +3,16 @@ import { useRaceCalendar, useRaceTrackIntel } from "../../hooks/useRaceData";
 import CalendarRaceDetail from "./components/CalendarRaceDetail";
 import CalendarRaceList from "./components/CalendarRaceList";
 import { normalizeKey } from "./calendarUtils";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const RACE_IMAGES = {};
 
@@ -28,25 +38,36 @@ const CalenderPage = ({ year, selectedGP, onRaceSelect }) => {
 
   if (calendar.isLoading) {
     return (
-      <div className="py-24 text-center text-[#ff1801] font-black tracking-[0.3em] uppercase">
-        LOADING_CALENDER...
-      </div>
+      <Card className="overflow-hidden">
+        <CardHeader className="space-y-2">
+          <Skeleton className="h-6 w-48" />
+          <Skeleton className="h-4 w-32" />
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Skeleton className="h-[420px] w-full rounded-lg lg:h-[520px]" />
+        </CardContent>
+      </Card>
     );
   }
 
   if (calendar.error) {
     return (
-      <div className="p-8 text-red-400 bg-red-500/10 rounded-2xl text-center font-bold">
-        CALENDER_ERROR: {calendar.error.message}
-      </div>
+      <Alert variant="destructive">
+        <AlertTitle>Calendar error</AlertTitle>
+        <AlertDescription>{calendar.error.message}</AlertDescription>
+      </Alert>
     );
   }
 
   if (!events.length) {
     return (
-      <div className="p-8 rounded-2xl border border-white/10 text-center text-white/60 uppercase tracking-wide">
-        No races available for this season.
-      </div>
+      <Card className="border-dashed">
+        <CardContent className="py-12 text-center">
+          <CardDescription className="text-base">
+            No races available for this season.
+          </CardDescription>
+        </CardContent>
+      </Card>
     );
   }
 
@@ -60,31 +81,37 @@ const CalenderPage = ({ year, selectedGP, onRaceSelect }) => {
   };
 
   return (
-    <div className="bg-[#0a0a10] border border-white/5 rounded-2xl overflow-hidden">
-      <div className="px-6 py-4 border-b border-white/5 flex items-center justify-between">
-        <h2 className="text-sm md:text-base font-black uppercase tracking-[0.15em] text-white/90">
-          {year} Race Calender
-        </h2>
-        <span className="text-xs text-white/60 border border-white/10 rounded-full px-3 py-1 font-bold">
+    <Card className="overflow-hidden border-border/80 shadow-lg">
+      <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-3 border-b border-border/60">
+        <div>
+          <CardTitle className="font-headline text-base uppercase tracking-[0.12em] md:text-lg">
+            {year} race calendar
+          </CardTitle>
+          <CardDescription>
+            Browse rounds and sync with header GP.
+          </CardDescription>
+        </div>
+        <Badge variant="secondary" className="font-bold tabular-nums">
           {events.length} races
-        </span>
-      </div>
-
-      <div className="flex flex-col lg:flex-row min-h-[720px]">
-        <CalendarRaceDetail
-          event={selectedEvent}
-          imageUrl={selectedImage}
-          trackIntel={trackIntel.data}
-          trackIntelLoading={trackIntel.isLoading}
-          trackIntelError={trackIntel.error}
-        />
-        <CalendarRaceList
-          events={events}
-          selectedRaceName={selectedEvent?.EventName}
-          onSelectRace={handleSelectRace}
-        />
-      </div>
-    </div>
+        </Badge>
+      </CardHeader>
+      <CardContent className="p-0">
+        <div className="flex min-h-[720px] flex-col lg:flex-row">
+          <CalendarRaceDetail
+            event={selectedEvent}
+            imageUrl={selectedImage}
+            trackIntel={trackIntel.data}
+            trackIntelLoading={trackIntel.isLoading}
+            trackIntelError={trackIntel.error}
+          />
+          <CalendarRaceList
+            events={events}
+            selectedRaceName={selectedEvent?.EventName}
+            onSelectRace={handleSelectRace}
+          />
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 
