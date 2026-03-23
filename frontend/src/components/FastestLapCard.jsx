@@ -1,85 +1,44 @@
 import React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
-const FastestLapCard = ({ driver, time, lap, label = "FASTEST LAP" }) => {
+const FastestLapCard = ({ driver, time, lap, label = "Fastest lap" }) => {
   return (
-    <div style={styles.card}>
-      <div style={styles.glowOverlay} />
-      <div style={styles.headerContainer}>
-        <p style={styles.label}>{label}</p>
-        <span style={styles.badge}>PURPLE SECTOR</span>
-      </div>
-      <div style={styles.content}>
-        <h2 style={styles.timeText}>{time}s</h2>
-        <span style={styles.driverText}>{driver}</span>
-      </div>
-      <p style={styles.footerText}>SET ON LAP {lap}</p>
-    </div>
+    <Card className="relative overflow-hidden border-violet-500/25 bg-gradient-to-br from-card to-muted/30 ring-1 ring-violet-500/25">
+      <div
+        className="pointer-events-none absolute -right-8 -top-8 size-32 rounded-full bg-violet-500/15 blur-2xl"
+        aria-hidden
+      />
+      <CardHeader className="flex flex-row items-start justify-between gap-2">
+        <CardDescription className="text-[0.65rem] font-black uppercase tracking-[0.2em]">
+          {label}
+        </CardDescription>
+        <Badge
+          variant="secondary"
+          className="border border-violet-500/30 bg-violet-500/15 text-[0.6rem] font-black uppercase tracking-wide text-violet-300"
+        >
+          Purple sector
+        </Badge>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <div className="flex flex-wrap items-baseline gap-3">
+          <CardTitle className="font-headline text-4xl font-black italic tracking-tight text-foreground">
+            {time}s
+          </CardTitle>
+          <span className="text-base font-bold text-violet-400">{driver}</span>
+        </div>
+        <p className="text-[0.65rem] font-bold uppercase tracking-wider text-muted-foreground">
+          Set on lap {lap}
+        </p>
+      </CardContent>
+    </Card>
   );
-};
-
-const styles = {
-  card: {
-    background: "linear-gradient(145deg, #111 0%, #050505 100%)",
-    border: "1px solid rgba(168, 85, 247, 0.2)", // Purple border
-    padding: "1.5rem",
-    borderRadius: "1.5rem",
-    position: "relative",
-    overflow: "hidden",
-    boxShadow: "0 10px 30px -10px rgba(0,0,0,0.7)",
-  },
-  glowOverlay: {
-    position: "absolute",
-    top: 0,
-    right: 0,
-    width: "100px",
-    height: "100px",
-    background:
-      "radial-gradient(circle, rgba(168, 85, 247, 0.15) 0%, transparent 70%)",
-  },
-  headerContainer: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: "1rem",
-  },
-  label: {
-    fontSize: "0.65rem",
-    fontWeight: "900",
-    color: "#666",
-    textTransform: "uppercase",
-    letterSpacing: "0.2em",
-  },
-  badge: {
-    fontSize: "0.6rem",
-    fontWeight: "900",
-    color: "#a855f7",
-    background: "rgba(168, 85, 247, 0.1)",
-    padding: "2px 8px",
-    borderRadius: "4px",
-  },
-  content: {
-    display: "flex",
-    alignItems: "baseline",
-    gap: "0.75rem",
-  },
-  timeText: {
-    fontSize: "2.25rem",
-    fontWeight: "900",
-    fontStyle: "italic",
-    color: "#fff",
-    letterSpacing: "-0.05em",
-  },
-  driverText: {
-    fontSize: "1rem",
-    fontWeight: "700",
-    color: "#a855f7",
-  },
-  footerText: {
-    fontSize: "0.6rem",
-    color: "#444",
-    fontWeight: "700",
-    marginTop: "0.5rem",
-  },
 };
 
 export default FastestLapCard;
