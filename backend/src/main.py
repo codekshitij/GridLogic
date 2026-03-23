@@ -131,6 +131,66 @@ def get_driver_telemetry(year: int, gp: str, drivers: str = Query(...)):
     data = processor.get_selective_telemetry(year, gp, driver_list)
     return {"pace_evolution": data}
 
+
+@app.get("/races/{year}/{gp}/telemetry/lap-matrix")
+def lap_tire_matrix(year: int, gp: str, drivers: str = Query(...)):
+    """Per-lap tire compound per driver (rows = drivers, columns = lap numbers)."""
+    driver_list = [d.strip() for d in drivers.split(",") if d.strip()]
+    if not driver_list:
+        raise HTTPException(status_code=400, detail="Provide at least one driver code")
+    try:
+        return processor.get_lap_tire_matrix(year, gp, driver_list)
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Lap tire matrix failed: {str(e)}",
+        ) from e
+
+
+@app.get("/races/{year}/{gp}/telemetry/lap-compare")
+def lap_compare_telemetry(
+    year: int,
+    gp: str,
+    drivers: str = Query(
+        ...,
+        description="Comma-separated driver codes in order, e.g. RUS,NOR",
+    ),
+    laps: str = Query(
+        ...,
+        description="Comma-separated lap numbers matching drivers, e.g. 21,53",
+    ),
+):
+    """Per-lap telemetry (speed, throttle, brake, RPM, gear, XY) and delta for two laps."""
+    driver_list = [d.strip() for d in drivers.split(",") if d.strip()]
+    lap_parts = [p.strip() for p in laps.split(",") if p.strip()]
+    if len(driver_list) != len(lap_parts):
+        raise HTTPException(
+            status_code=400,
+            detail="drivers and laps must have the same number of entries",
+        )
+    if len(driver_list) < 1 or len(driver_list) > 2:
+        raise HTTPException(
+            status_code=400,
+            detail="Provide one or two driver/lap pairs",
+        )
+    try:
+        lap_nums = [int(x) for x in lap_parts]
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=400,
+            detail="All lap values must be integers",
+        ) from exc
+    specs = list(zip(driver_list, lap_nums))
+    try:
+        return processor.compare_lap_telemetry(year, gp, specs)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e)) from e
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Lap telemetry failed: {str(e)}",
+        ) from e
+
 @app.get("/races/{year}/{gp}/analytics")
 def get_race_analytics(year: int, gp: str):
     try:
